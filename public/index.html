@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -8,13 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 
 <!-- ── Supabase SDK ────────────────────────────────────────────────────────── -->
-
 <!-- Le variabili SUPABASE_URL e SUPABASE_ANON_KEY sono pubbliche per design:  -->
-
 <!-- la anon key di Supabase è pensata per stare nel frontend. La sicurezza     -->
-
 <!-- vera viene dalle Row Level Security policies nel database.                  -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -233,12 +228,10 @@
     .user-email { display: none; }
   }
 </style>
-
 </head>
 <body>
 
 <!-- ── LOGIN ──────────────────────────────────────────────────────────────── -->
-
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">Term Reports</div>
@@ -258,7 +251,6 @@
 </div>
 
 <!-- ── MAIN APP ────────────────────────────────────────────────────────────── -->
-
 <div id="app">
   <div class="topbar">
     <div class="topbar-brand">Term<span>Reports</span></div>
@@ -273,196 +265,193 @@
   </div>
 
   <!-- GENERATE VIEW -->
-
   <div class="view active" id="view-generate">
     <div class="view-title">Genera Term Report</div>
     <div class="view-desc">Inserisci i follow-up dello studente e le note integrative per generare il report personalizzato.</div>
 
-```
-<div class="form-grid">
-  <div class="field-group">
-    <label>Nome studente</label>
-    <input type="text" id="student-name" placeholder="es. Aurora Avitabile">
-  </div>
-  <div class="field-group">
-    <label>Corso</label>
-    <select id="course-select" onchange="onCourseChange()">
-      <option value="">— Seleziona corso —</option>
-      <option value="mousy">Mousy</option>
-      <option value="linda">Linda</option>
-      <option value="sam">Sam</option>
-      <option value="emma">Emma</option>
-      <option value="oliver">Oliver</option>
-      <option value="marcia">Marcia</option>
-      <option value="pam_paul">Pam &amp; Paul</option>
-      <option value="ben_brenda">Ben &amp; Brenda</option>
-    </select>
-    <div class="course-info-panel" id="course-info-panel"></div>
-  </div>
-  <div class="field-group">
-    <label>Trimestre</label>
-    <select id="trimestre-select">
-      <option value="T1">T1 — Primo trimestre</option>
-      <option value="T2">T2 — Secondo trimestre</option>
-      <option value="T3">T3 — Terzo trimestre</option>
-    </select>
-  </div>
-  <div class="field-group">
-    <label>Genere studente</label>
-    <select id="gender-select">
-      <option value="M">Maschio</option>
-      <option value="F">Femmina</option>
-    </select>
-  </div>
-</div>
-
-<div class="form-grid">
-  <div class="field-group">
-    <label>Tipo di report</label>
-    <div class="report-type-toggle">
-      <button class="active" id="btn-trimestrale" onclick="setReportType('trimestrale')">Trimestrale</button>
-      <button id="btn-finale" onclick="setReportType('finale')">Finale (con valutazione annuale)</button>
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Nome studente</label>
+        <input type="text" id="student-name" placeholder="es. Aurora Avitabile">
+      </div>
+      <div class="field-group">
+        <label>Corso</label>
+        <select id="course-select" onchange="onCourseChange()">
+          <option value="">— Seleziona corso —</option>
+          <option value="mousy">Mousy</option>
+          <option value="linda">Linda</option>
+          <option value="sam">Sam</option>
+          <option value="emma">Emma</option>
+          <option value="oliver">Oliver</option>
+          <option value="marcia">Marcia</option>
+          <option value="pam_paul">Pam &amp; Paul</option>
+          <option value="ben_brenda">Ben &amp; Brenda</option>
+        </select>
+        <div class="course-info-panel" id="course-info-panel"></div>
+      </div>
+      <div class="field-group">
+        <label>Trimestre</label>
+        <select id="trimestre-select">
+          <option value="T1">T1 — Primo trimestre</option>
+          <option value="T2">T2 — Secondo trimestre</option>
+          <option value="T3">T3 — Terzo trimestre</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Genere studente</label>
+        <select id="gender-select">
+          <option value="M">Maschio</option>
+          <option value="F">Femmina</option>
+        </select>
+      </div>
     </div>
-  </div>
-  <div class="field-group">
-    <label>Oral test</label>
-    <input type="text" id="oral-test" placeholder="es. Superato con ottimi risultati / Non ancora svolto">
-  </div>
-</div>
 
-<div class="section-divider"><span>Tipologia genitore</span></div>
-
-<div class="field-group" style="margin-bottom:20px">
-  <label>Come è il genitore?</label>
-  <div class="parent-type-grid">
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-standard" value="standard" checked>
-      <label for="pt-standard"><span class="emoji">😊</span>Standard</label>
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Tipo di report</label>
+        <div class="report-type-toggle">
+          <button class="active" id="btn-trimestrale" onclick="setReportType('trimestrale')">Trimestrale</button>
+          <button id="btn-finale" onclick="setReportType('finale')">Finale (con valutazione annuale)</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Oral test</label>
+        <input type="text" id="oral-test" placeholder="es. Superato con ottimi risultati / Non ancora svolto">
+      </div>
     </div>
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-permaloso" value="permaloso">
-      <label for="pt-permaloso"><span class="emoji">😤</span>Permaloso / Suscettibile</label>
+
+    <div class="section-divider"><span>Tipologia genitore</span></div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Come è il genitore?</label>
+      <div class="parent-type-grid">
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-standard" value="standard" checked>
+          <label for="pt-standard"><span class="emoji">😊</span>Standard</label>
+        </div>
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-permaloso" value="permaloso">
+          <label for="pt-permaloso"><span class="emoji">😤</span>Permaloso / Suscettibile</label>
+        </div>
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-pignolo" value="pignolo">
+          <label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo / Esigente</label>
+        </div>
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-ansioso" value="ansioso">
+          <label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label>
+        </div>
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-entusiasta" value="entusiasta">
+          <label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label>
+        </div>
+        <div class="parent-type-option">
+          <input type="radio" name="parent-type" id="pt-distaccato" value="distaccato">
+          <label for="pt-distaccato"><span class="emoji">😶</span>Distaccato / Critico</label>
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:8px">Questa informazione guida il tono del report ma non verrà mai citata nel testo finale.</div>
     </div>
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-pignolo" value="pignolo">
-      <label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo / Esigente</label>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Note integrative interne</label>
+      <textarea id="extra-notes" placeholder="es. La mamma tende ad essere apprensiva, rassicurarla molto. / Il bambino ha vissuto un periodo difficile in famiglia..."></textarea>
+      <div class="field-hint">Usate dall'AI per guidare il tono e i contenuti, non compaiono nel testo del report.</div>
     </div>
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-ansioso" value="ansioso">
-      <label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label>
+
+    <div class="section-divider"><span>Follow-up giornalieri</span></div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Follow-up lezioni</label>
+      <textarea id="followups" style="min-height:180px" placeholder="Incolla qui tutti i follow-up delle lezioni del trimestre. Es:
+12/01 - Oggi Aurora era molto vivace, ha ripetuto 'red' e 'blue' spontaneamente.
+19/01 - Ottima lezione, ha partecipato attivamente alle canzoni..."></textarea>
     </div>
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-entusiasta" value="entusiasta">
-      <label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label>
+
+    <div class="section-divider"><span>Report precedenti (opzionale)</span></div>
+
+    <div class="field-group" style="margin-bottom:28px">
+      <label>Carica report precedente per garantire continuità</label>
+      <div class="upload-zone">
+        <input type="file" id="prev-report-file" accept=".txt,.pdf,.docx" onchange="handleFileUpload(this)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text"><strong>Clicca o trascina</strong> il report precedente</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">Oppure incolla il testo nel campo sottostante</div>
+      </div>
+      <div class="uploaded-file" id="uploaded-file-info" style="display:none;margin-top:10px">
+        <span>✓</span><span id="uploaded-file-name"></span>
+        <button onclick="clearUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      </div>
+      <textarea id="prev-report-text" style="margin-top:10px;min-height:80px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
     </div>
-    <div class="parent-type-option">
-      <input type="radio" name="parent-type" id="pt-distaccato" value="distaccato">
-      <label for="pt-distaccato"><span class="emoji">😶</span>Distaccato / Critico</label>
-    </div>
-  </div>
-  <div class="field-hint" style="margin-top:8px">Questa informazione guida il tono del report ma non verrà mai citata nel testo finale.</div>
-</div>
 
-<div class="field-group" style="margin-bottom:20px">
-  <label>Note integrative interne</label>
-  <textarea id="extra-notes" placeholder="es. La mamma tende ad essere apprensiva, rassicurarla molto. / Il bambino ha vissuto un periodo difficile in famiglia..."></textarea>
-  <div class="field-hint">Usate dall'AI per guidare il tono e i contenuti, non compaiono nel testo del report.</div>
-</div>
-
-<div class="section-divider"><span>Follow-up giornalieri</span></div>
-
-<div class="field-group" style="margin-bottom:20px">
-  <label>Follow-up lezioni</label>
-  <textarea id="followups" style="min-height:180px" placeholder="Incolla qui tutti i follow-up delle lezioni del trimestre. Es:
-```
-
-12/01 - Oggi Aurora era molto vivace, ha ripetuto ‘red’ e ‘blue’ spontaneamente.
-19/01 - Ottima lezione, ha partecipato attivamente alle canzoni…”></textarea>
-</div>
-
-```
-<div class="section-divider"><span>Report precedenti (opzionale)</span></div>
-
-<div class="field-group" style="margin-bottom:28px">
-  <label>Carica report precedente per garantire continuità</label>
-  <div class="upload-zone">
-    <input type="file" id="prev-report-file" accept=".txt,.pdf,.docx" onchange="handleFileUpload(this)">
-    <div class="upload-icon">📄</div>
-    <div class="upload-text"><strong>Clicca o trascina</strong> il report precedente</div>
-    <div class="upload-text" style="margin-top:4px;font-size:12px">Oppure incolla il testo nel campo sottostante</div>
-  </div>
-  <div class="uploaded-file" id="uploaded-file-info" style="display:none;margin-top:10px">
-    <span>✓</span><span id="uploaded-file-name"></span>
-    <button onclick="clearUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
-  </div>
-  <textarea id="prev-report-text" style="margin-top:10px;min-height:80px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
-</div>
-
-<button class="btn-generate" onclick="generateReport()" id="generate-btn">
-  <span>✦</span> Genera Report
-</button>
-
-<div class="loading-bar" id="loading-bar">
-  <div class="spinner"></div>
-  <div class="loading-text">
-    <strong id="loading-msg">Elaborazione in corso...</strong>
-    <span>L'AI sta analizzando i follow-up e personalizzando il report</span>
-  </div>
-</div>
-
-<div id="results-area">
-  <div class="results-header">
-    <div class="results-title">📋 Report generato</div>
-    <button class="btn-save" id="btn-save" onclick="saveToSupabase()">
-      <span>◈</span> Salva nello storico
+    <button class="btn-generate" onclick="generateReport()" id="generate-btn">
+      <span>✦</span> Genera Report
     </button>
-  </div>
-  <div id="alert-container"></div>
-  <div id="sections-container"></div>
-</div>
-```
 
+    <div class="loading-bar" id="loading-bar">
+      <div class="spinner"></div>
+      <div class="loading-text">
+        <strong id="loading-msg">Elaborazione in corso...</strong>
+        <span>L'AI sta analizzando i follow-up e personalizzando il report</span>
+      </div>
+    </div>
+
+    <!-- DEBUG PANEL -->
+    <div id="debug-panel" style="display:none; margin-top:16px; background:#1A1714; border-radius:12px; overflow:hidden;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:#2a2420;">
+        <span style="color:#8B7355; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">⚙ Log di sistema</span>
+        <button onclick="document.getElementById('debug-panel').style.display='none'" style="background:none; border:none; color:#6B6158; cursor:pointer; font-size:16px;">✕</button>
+      </div>
+      <div id="debug-list" style="padding:12px 16px; max-height:200px; overflow-y:auto; color:#aaa;"></div>
+    </div>
+
+    <div id="results-area">
+      <div class="results-header">
+        <div class="results-title">📋 Report generato</div>
+        <button class="btn-save" id="btn-save" onclick="saveToSupabase()">
+          <span>◈</span> Salva nello storico
+        </button>
+      </div>
+      <div id="alert-container"></div>
+      <div id="sections-container"></div>
+    </div>
   </div>
 
   <!-- HISTORY VIEW -->
-
   <div class="view" id="view-history">
     <div class="view-title">Storico Report</div>
     <div class="view-desc">Tutti i tuoi report salvati, con accesso rapido ad ogni sezione.</div>
 
-```
-<div class="history-filters">
-  <select id="filter-course" onchange="loadHistory()">
-    <option value="">Tutti i corsi</option>
-    <option value="mousy">Mousy</option>
-    <option value="linda">Linda</option>
-    <option value="sam">Sam</option>
-    <option value="emma">Emma</option>
-    <option value="oliver">Oliver</option>
-    <option value="marcia">Marcia</option>
-    <option value="pam_paul">Pam &amp; Paul</option>
-    <option value="ben_brenda">Ben &amp; Brenda</option>
-  </select>
-  <select id="filter-term" onchange="loadHistory()">
-    <option value="">Tutti i trimestri</option>
-    <option value="T1">T1</option>
-    <option value="T2">T2</option>
-    <option value="T3">T3</option>
-  </select>
-  <input type="text" id="filter-name" placeholder="🔍 Cerca per nome..." oninput="loadHistory()">
-</div>
+    <div class="history-filters">
+      <select id="filter-course" onchange="loadHistory()">
+        <option value="">Tutti i corsi</option>
+        <option value="mousy">Mousy</option>
+        <option value="linda">Linda</option>
+        <option value="sam">Sam</option>
+        <option value="emma">Emma</option>
+        <option value="oliver">Oliver</option>
+        <option value="marcia">Marcia</option>
+        <option value="pam_paul">Pam &amp; Paul</option>
+        <option value="ben_brenda">Ben &amp; Brenda</option>
+      </select>
+      <select id="filter-term" onchange="loadHistory()">
+        <option value="">Tutti i trimestri</option>
+        <option value="T1">T1</option>
+        <option value="T2">T2</option>
+        <option value="T3">T3</option>
+      </select>
+      <input type="text" id="filter-name" placeholder="🔍 Cerca per nome..." oninput="loadHistory()">
+    </div>
 
-<div id="history-loading" style="display:none;text-align:center;padding:40px;color:var(--muted)">
-  <div class="spinner" style="margin:0 auto 12px"></div>Caricamento...
-</div>
-<div class="history-list" id="history-list"></div>
-```
-
+    <div id="history-loading" style="display:none;text-align:center;padding:40px;color:var(--muted)">
+      <div class="spinner" style="margin:0 auto 12px"></div>Caricamento...
+    </div>
+    <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
 <!-- MODAL: visualizza report storico -->
-
 <div class="modal-overlay" id="modal-view" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -477,7 +466,6 @@
 </div>
 
 <!-- TOAST -->
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -488,8 +476,8 @@
 // La anon key è progettata per stare nel frontend: la sicurezza viene
 // dalle Row Level Security policies che creeremo nel database.
 // ════════════════════════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_lxw3xSpzh91RxAaj89R07Q_utP0Qq2m';
+const SUPABASE_URL  = 'INSERISCI_QUI_IL_TUO_SUPABASE_URL';
+const SUPABASE_ANON = 'INSERISCI_QUI_LA_TUA_SUPABASE_ANON_KEY';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -661,7 +649,25 @@ const PARENT_GUIDANCE = {
   distaccato:  'Tono formale e molto professionale. Fatti concreti, progressi misurabili, strategie chiare. Meno calore, più sostanza e precisione.'
 };
 
+function debugLog(msg, type = 'info') {
+  const panel = document.getElementById('debug-panel');
+  const list  = document.getElementById('debug-list');
+  if (!panel || !list) return;
+  panel.style.display = 'block';
+  const time = new Date().toLocaleTimeString('it-IT');
+  const colors = { info: '#aaa', ok: '#7A9E87', error: '#e07060', warn: '#C97D20' };
+  const el = document.createElement('div');
+  el.style.cssText = `font-size:12px; padding:3px 0; border-bottom:1px solid #2a2420; color:${colors[type]||colors.info}; font-family:monospace; word-break:break-all;`;
+  el.textContent = '[' + time + '] ' + msg;
+  list.appendChild(el);
+  list.scrollTop = list.scrollHeight;
+}
+
 async function generateReport() {
+  // Reset debug panel
+  const debugList = document.getElementById('debug-list');
+  if (debugList) debugList.innerHTML = '';
+
   const studentName = document.getElementById('student-name').value.trim();
   const course      = document.getElementById('course-select').value;
   const trimestre   = document.getElementById('trimestre-select').value;
@@ -672,10 +678,19 @@ async function generateReport() {
   const parentType  = document.querySelector('input[name="parent-type"]:checked').value;
   const prevReport  = uploadedFileContent || document.getElementById('prev-report-text').value.trim();
 
+  debugLog('Bottone premuto — controllo campi...', 'info');
+
   if (!studentName || !course || !followups) {
-    showToast('Compila nome studente, corso e follow-up.', 'error');
+    const missing = [];
+    if (!studentName) missing.push('nome studente');
+    if (!course) missing.push('corso');
+    if (!followups) missing.push('follow-up');
+    debugLog('Campi mancanti: ' + missing.join(', '), 'error');
+    showToast('Compila: ' + missing.join(', '), 'error');
     return;
   }
+
+  debugLog('Studente: ' + studentName + ' | Corso: ' + course + ' | ' + trimestre, 'info');
 
   const btn = document.getElementById('generate-btn');
   btn.disabled = true;
@@ -737,25 +752,59 @@ Genera il report con queste sezioni (testo fluido in italiano, NO bullet points)
   "oral_test": "..."${finaleExtra}
 }`;
 
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1800,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
+    debugLog('Invio richiesta a /api/generate...', 'info');
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || 'Errore API');
+    let response;
+    try {
+      response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1800,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+    } catch (fetchErr) {
+      debugLog('Errore di rete: ' + fetchErr.message, 'error');
+      throw new Error('Server non raggiungibile: ' + fetchErr.message);
+    }
+
+    debugLog('Risposta ricevuta — HTTP status: ' + response.status, response.ok ? 'ok' : 'error');
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      debugLog('Risposta non JSON — status: ' + response.status, 'error');
+      throw new Error('Risposta non valida dal server (HTTP ' + response.status + ')');
+    }
+
+    if (!response.ok) {
+      const errMsg = data?.error?.message || JSON.stringify(data).substring(0, 200);
+      debugLog('Errore API Anthropic: ' + errMsg, 'error');
+      throw new Error(errMsg);
+    }
+
+    debugLog('Risposta API ok — estrazione contenuto...', 'ok');
 
     const rawText = data.content?.find(b => b.type === 'text')?.text || '';
+    if (!rawText) {
+      debugLog('Nessun testo nella risposta. Struttura: ' + JSON.stringify(data).substring(0, 300), 'error');
+      throw new Error('Risposta vuota dall\'AI');
+    }
+
+    debugLog('Testo ricevuto (' + rawText.length + ' caratteri) — parsing JSON...', 'info');
+
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Formato risposta non valido');
+    if (!jsonMatch) {
+      debugLog('JSON non trovato. Inizio testo: ' + rawText.substring(0, 300), 'error');
+      throw new Error('Formato risposta non valido');
+    }
 
     const sections = JSON.parse(jsonMatch[0]);
+    debugLog('Successo! Sezioni generate: ' + Object.keys(sections).join(', '), 'ok');
 
     currentReport = {
       student_name: studentName,
@@ -772,6 +821,7 @@ Genera il report con queste sezioni (testo fluido in italiano, NO bullet points)
     renderResults(sections);
 
   } catch (err) {
+    debugLog('ERRORE: ' + err.message, 'error');
     showToast('Errore: ' + err.message, 'error');
     console.error(err);
   } finally {
@@ -981,6 +1031,5 @@ function showToast(msg, type = '') {
   setTimeout(() => el.classList.remove('show'), 3500);
 }
 </script>
-
 </body>
 </html>
