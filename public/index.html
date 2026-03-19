@@ -1042,6 +1042,10 @@ async function loadHistory() {
         </div>
       </div>`;
   }).join('');
+  } catch(err) {
+    loadingEl.style.display = 'none';
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Errore</div><div class="empty-desc">' + err.message + '</div></div>';
+  }
 }
 
 function viewItem(itemJson) {
