@@ -385,9 +385,14 @@
       <textarea id="prev-report-text" style="margin-top:10px;min-height:80px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
     </div>
 
-    <button class="btn-generate" onclick="generateReport()" id="generate-btn">
-      <span>✦</span> Genera Report
-    </button>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <button class="btn-generate" onclick="generateReport()" id="generate-btn">
+        <span>✦</span> Genera Report
+      </button>
+      <button onclick="resetForm()" style="background:transparent; border:1.5px solid var(--border); border-radius:12px; padding:15px 24px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; color:var(--muted); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        ↺ Nuovo studente
+      </button>
+    </div>
 
     <div class="loading-bar" id="loading-bar">
       <div class="spinner"></div>
@@ -484,7 +489,15 @@
 const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsdXl2cWZhZXpldXd3c3lpb2hjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTk1MzIsImV4cCI6MjA4OTQ5NTUzMn0.MHVFS3fCezTKnGhNJuxTsXDPRB0Hp_NueIUkMTXlyac';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    persistSession: true,
+    storageKey: 'tr-auth',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  }
+});
 
 // ════════════════════════════════════════════════════════════════════════════
 // AUTH
@@ -910,22 +923,53 @@ function renderResults(sections) {
 // SALVA SU SUPABASE
 // ════════════════════════════════════════════════════════════════════════════
 async function saveToSupabase() {
-  if (!currentReport || !currentUser) return;
+  if (!currentReport) return;
 
   const btn = document.getElementById('btn-save');
   btn.disabled = true;
   btn.innerHTML = '<span>◌</span> Salvataggio...';
 
-  const { error } = await sb
+  debugLog('Tentativo salvataggio...', 'info');
+
+  // Check session
+  const { data: { session } } = await sb.auth.getSession();
+  debugLog('Sessione: ' + (session ? session.user.email : 'NESSUNA'), session ? 'ok' : 'error');
+
+  if (!session) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>◈</span> Salva nello storico';
+    showToast('Sessione scaduta — effettua di nuovo il login.', 'error');
+    return;
+  }
+
+  // Insert without user_id first to test basic connectivity
+  const payload = {
+    student_name: currentReport.student_name,
+    course: currentReport.course,
+    trimestre: currentReport.trimestre,
+    gender: currentReport.gender,
+    parent_type: currentReport.parent_type,
+    oral_test: currentReport.oral_test,
+    report_type: currentReport.report_type,
+    sections: currentReport.sections,
+    user_id: session.user.id
+  };
+
+  debugLog('Payload pronto, invio a Supabase...', 'info');
+
+  const { data, error } = await sb
     .from('reports')
-    .insert({ ...currentReport, user_id: currentUser.id });
+    .insert(payload)
+    .select();
 
   btn.disabled = false;
 
   if (error) {
+    debugLog('Errore Supabase: ' + error.message + ' | code: ' + error.code, 'error');
     btn.innerHTML = '<span>◈</span> Salva nello storico';
     showToast('Errore nel salvataggio: ' + error.message, 'error');
   } else {
+    debugLog('Salvato! ID: ' + (data?.[0]?.id || 'ok'), 'ok');
     btn.innerHTML = '<span>✓</span> Salvato!';
     btn.style.background = 'var(--success)';
     showToast('Report salvato nello storico!', 'success');
@@ -1062,6 +1106,27 @@ function escHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function resetForm() {
+  document.getElementById('student-name').value = '';
+  document.getElementById('course-select').value = '';
+  document.getElementById('oral-test').value = '';
+  document.getElementById('followups').value = '';
+  document.getElementById('extra-notes').value = '';
+  document.getElementById('prev-report-text').value = '';
+  document.querySelector('input[name="parent-type"][value="standard"]').checked = true;
+  clearUpload();
+  document.getElementById('course-info-panel').classList.remove('visible');
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('debug-panel').style.display = 'none';
+  document.getElementById('debug-list').innerHTML = '';
+  // Reset trimestre to default
+  const sel = document.getElementById('trimestre-select');
+  sel.innerHTML = '<option value="T1">Term 1</option><option value="T2">Term 2</option><option value="T3">Term 3 (finale)</option>';
+  setReportType('trimestrale');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Form azzerato — pronto per un nuovo studente!', 'success');
 }
 
 function showToast(msg, type = '') {
