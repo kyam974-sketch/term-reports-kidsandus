@@ -489,15 +489,7 @@
 const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsdXl2cWZhZXpldXd3c3lpb2hjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTk1MzIsImV4cCI6MjA4OTQ5NTUzMn0.MHVFS3fCezTKnGhNJuxTsXDPRB0Hp_NueIUkMTXlyac';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: {
-    persistSession: true,
-    storageKey: 'tr-auth',
-    storage: window.localStorage,
-    autoRefreshToken: true,
-    detectSessionInUrl: false
-  }
-});
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ════════════════════════════════════════════════════════════════════════════
 // AUTH
@@ -929,9 +921,8 @@ async function saveToSupabase() {
   btn.disabled = true;
   btn.innerHTML = '<span>◌</span> Salvataggio...';
 
-  debugLog('Tentativo salvataggio...', 'info');
+  debugLog('Tentativo salvataggio via server...', 'info');
 
-  // Check session
   const { data: { session } } = await sb.auth.getSession();
   debugLog('Sessione: ' + (session ? session.user.email : 'NESSUNA'), session ? 'ok' : 'error');
 
@@ -942,41 +933,47 @@ async function saveToSupabase() {
     return;
   }
 
-  // Insert without user_id first to test basic connectivity
-  const payload = {
-    student_name: currentReport.student_name,
-    course: currentReport.course,
-    trimestre: currentReport.trimestre,
-    gender: currentReport.gender,
-    parent_type: currentReport.parent_type,
-    oral_test: currentReport.oral_test,
-    report_type: currentReport.report_type,
-    sections: currentReport.sections,
-    user_id: session.user.id
-  };
+  try {
+    const res = await fetch('/api/save-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: session.access_token,
+        report: {
+          student_name: currentReport.student_name,
+          course: currentReport.course,
+          trimestre: currentReport.trimestre,
+          gender: currentReport.gender,
+          parent_type: currentReport.parent_type,
+          oral_test: currentReport.oral_test,
+          report_type: currentReport.report_type,
+          sections: currentReport.sections
+        }
+      })
+    });
 
-  debugLog('Payload pronto, invio a Supabase...', 'info');
+    const result = await res.json();
+    btn.disabled = false;
 
-  const { data, error } = await sb
-    .from('reports')
-    .insert(payload)
-    .select();
-
-  btn.disabled = false;
-
-  if (error) {
-    debugLog('Errore Supabase: ' + error.message + ' | code: ' + error.code, 'error');
-    btn.innerHTML = '<span>◈</span> Salva nello storico';
-    showToast('Errore nel salvataggio: ' + error.message, 'error');
-  } else {
-    debugLog('Salvato! ID: ' + (data?.[0]?.id || 'ok'), 'ok');
-    btn.innerHTML = '<span>✓</span> Salvato!';
-    btn.style.background = 'var(--success)';
-    showToast('Report salvato nello storico!', 'success');
-    setTimeout(() => {
+    if (!res.ok || result.error) {
+      debugLog('Errore server: ' + (result.error || res.status), 'error');
       btn.innerHTML = '<span>◈</span> Salva nello storico';
-      btn.style.background = 'var(--sage)';
-    }, 3000);
+      showToast('Errore: ' + (result.error || 'Riprova'), 'error');
+    } else {
+      debugLog('Salvato con successo!', 'ok');
+      btn.innerHTML = '<span>✓</span> Salvato!';
+      btn.style.background = 'var(--success)';
+      showToast('Report salvato nello storico!', 'success');
+      setTimeout(() => {
+        btn.innerHTML = '<span>◈</span> Salva nello storico';
+        btn.style.background = 'var(--sage)';
+      }, 3000);
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>◈</span> Salva nello storico';
+    debugLog('Errore di rete: ' + err.message, 'error');
+    showToast('Errore di rete: ' + err.message, 'error');
   }
 }
 
@@ -984,32 +981,34 @@ async function saveToSupabase() {
 // STORICO DA SUPABASE
 // ════════════════════════════════════════════════════════════════════════════
 async function loadHistory() {
-  if (!currentUser) return;
-
   const loadingEl = document.getElementById('history-loading');
   const listEl    = document.getElementById('history-list');
   loadingEl.style.display = 'block';
   listEl.innerHTML = '';
 
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { loadingEl.style.display = 'none'; return; }
+
   const filterCourse = document.getElementById('filter-course').value;
   const filterTerm   = document.getElementById('filter-term').value;
   const filterName   = document.getElementById('filter-name').value.trim();
 
-  let query = sb
-    .from('reports')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
-
-  if (filterCourse) query = query.eq('course', filterCourse);
-  if (filterTerm)   query = query.eq('trimestre', filterTerm);
-  if (filterName)   query = query.ilike('student_name', `%${filterName}%`);
-
-  const { data: items, error } = await query;
-  loadingEl.style.display = 'none';
+  try {
+    const res = await fetch('/api/get-reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: session.access_token,
+        filters: { course: filterCourse, trimestre: filterTerm, name: filterName }
+      })
+    });
+    const result = await res.json();
+    loadingEl.style.display = 'none';
+    const items = result.data;
+    const error = result.error;
 
   if (error) {
-    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Errore nel caricamento</div><div class="empty-desc">${error.message}</div></div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Errore nel caricamento</div><div class="empty-desc">${error}</div></div>`;
     return;
   }
 
@@ -1080,8 +1079,16 @@ function viewItem(itemJson) {
 
 async function deleteItem(id) {
   if (!confirm('Eliminare questo report dallo storico?')) return;
-  const { error } = await sb.from('reports').delete().eq('id', id);
-  if (error) { showToast('Errore eliminazione: ' + error.message, 'error'); return; }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
+
+  const res = await fetch('/api/delete-report', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: session.access_token, id })
+  });
+  const result = await res.json();
+  if (!res.ok || result.error) { showToast('Errore: ' + (result.error || 'Riprova'), 'error'); return; }
   showToast('Report eliminato.', 'success');
   loadHistory();
 }
@@ -1138,14 +1145,18 @@ function showToast(msg, type = '') {
 }
 
 async function exportCSV() {
-  if (!currentUser) return;
-  const { data: items, error } = await sb
-    .from('reports')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
 
-  if (error || !items || items.length === 0) {
+  const res = await fetch('/api/get-reports', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: session.access_token, filters: {} })
+  });
+  const result = await res.json();
+  const items = result.data;
+
+  if (!items || items.length === 0) {
     showToast('Nessun report da esportare.', 'error');
     return;
   }
