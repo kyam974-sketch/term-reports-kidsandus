@@ -488,8 +488,8 @@
 // La anon key è progettata per stare nel frontend: la sicurezza viene
 // dalle Row Level Security policies che creeremo nel database.
 // ════════════════════════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'INSERISCI_QUI_IL_TUO_SUPABASE_URL';
-const SUPABASE_ANON = 'INSERISCI_QUI_LA_TUA_SUPABASE_ANON_KEY';
+const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_lxw3xSpzh91RxAaj89R07Q_utP0Qq2m';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
