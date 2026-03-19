@@ -290,7 +290,7 @@
         <div class="course-info-panel" id="course-info-panel"></div>
       </div>
       <div class="field-group">
-        <label>Trimestre</label>
+        <label id="trimestre-label">Trimestre</label>
         <select id="trimestre-select">
           <option value="T1">T1 — Primo trimestre</option>
           <option value="T2">T2 — Secondo trimestre</option>
@@ -420,7 +420,12 @@
 
   <!-- HISTORY VIEW -->
   <div class="view" id="view-history">
-    <div class="view-title">Storico Report</div>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px;">
+      <div class="view-title">Storico Report</div>
+      <button class="btn-save" onclick="exportCSV()" style="margin-top:8px; background:var(--warm-mid);">
+        <span>↓</span> Esporta CSV
+      </button>
+    </div>
     <div class="view-desc">Tutti i tuoi report salvati, con accesso rapido ad ogni sezione.</div>
 
     <div class="history-filters">
@@ -477,7 +482,7 @@
 // dalle Row Level Security policies che creeremo nel database.
 // ════════════════════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_lxw3xSpzh91RxAaj89R07Q_utP0Qq2m';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsdXl2cWZhZXpldXd3c3lpb2hjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTk1MzIsImV4cCI6MjA4OTQ5NTUzMn0.MHVFS3fCezTKnGhNJuxTsXDPRB0Hp_NueIUkMTXlyac';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -584,15 +589,51 @@ const SECTION_LABELS = {
   valutazione_annuale:         'Valutazione generale anno scolastico'
 };
 
+const BABIES_COURSES = ['mousy', 'linda'];
+
 function onCourseChange() {
-  const course = document.getElementById('course-select').value;
-  const panel  = document.getElementById('course-info-panel');
+  const course   = document.getElementById('course-select').value;
+  const panel    = document.getElementById('course-info-panel');
+  const selTrim  = document.getElementById('trimestre-select');
+  const labelTrim = document.getElementById('trimestre-label');
+
+  // Update course info panel
   if (course && COURSE_INFO[course]) {
-    const info = COURSE_INFO[course];
-    panel.innerHTML = `<strong>${info.label}</strong><br>${info.desc}`;
+    panel.innerHTML = `<strong>${COURSE_INFO[course].label}</strong><br>${COURSE_INFO[course].desc}`;
     panel.classList.add('visible');
   } else {
     panel.classList.remove('visible');
+  }
+
+  // Update trimestre options based on course type
+  if (course && BABIES_COURSES.includes(course)) {
+    labelTrim.textContent = 'Semester';
+    selTrim.innerHTML = `
+      <option value="S1">Semester 1</option>
+      <option value="S2">Semester 2 (finale)</option>`;
+    // Auto-set report type based on semester
+    selTrim.onchange = () => updateReportTypeFromTerm();
+    updateReportTypeFromTerm();
+  } else {
+    labelTrim.textContent = 'Term';
+    selTrim.innerHTML = `
+      <option value="T1">Term 1</option>
+      <option value="T2">Term 2</option>
+      <option value="T3">Term 3 (finale)</option>`;
+    selTrim.onchange = () => updateReportTypeFromTerm();
+    updateReportTypeFromTerm();
+  }
+}
+
+function updateReportTypeFromTerm() {
+  const course  = document.getElementById('course-select').value;
+  const trimVal = document.getElementById('trimestre-select').value;
+  const isBaby  = BABIES_COURSES.includes(course);
+  const isFinal = isBaby ? trimVal === 'S2' : trimVal === 'T3';
+  if (isFinal) {
+    setReportType('finale');
+  } else {
+    setReportType('trimestrale');
   }
 }
 
@@ -1029,6 +1070,51 @@ function showToast(msg, type = '') {
   el.className = 'toast' + (type ? ' ' + type : '');
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+async function exportCSV() {
+  if (!currentUser) return;
+  const { data: items, error } = await sb
+    .from('reports')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !items || items.length === 0) {
+    showToast('Nessun report da esportare.', 'error');
+    return;
+  }
+
+  const rows = [
+    ['Data', 'Studente', 'Corso', 'Trimestre', 'Tipo', 'Motivazione e partecipazione', 'Apprendimento', 'Comportamento', 'Oral test', 'Valutazione annuale']
+  ];
+
+  items.forEach(item => {
+    const s = item.sections || {};
+    rows.push([
+      new Date(item.created_at).toLocaleDateString('it-IT'),
+      item.student_name,
+      COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course,
+      item.trimestre,
+      item.report_type === 'finale' ? 'Finale' : 'Intermedio',
+      s.motivazione_partecipazione || '',
+      s.apprendimento || '',
+      s.comportamento || '',
+      s.oral_test || '',
+      s.valutazione_annuale || ''
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"'));
+  });
+
+  const csv = '﻿' + rows.map(r => r.join(',')).join('
+');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'term-reports-backup-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV esportato con successo!', 'success');
 }
 </script>
 </body>
