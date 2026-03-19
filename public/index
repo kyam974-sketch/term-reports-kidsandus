@@ -1,1 +1,1507 @@
-<!-- todo -->
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term Reports · Kids&Us</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --ink: #1A1714;
+    --warm-mid: #8B7355;
+    --accent: #D4714A;
+    --accent-light: #F0C9B8;
+    --sage: #7A9E87;
+    --sage-light: #C8DDD0;
+    --border: #E8E0D4;
+    --card: #FFFFFF;
+    --muted: #6B6158;
+    --danger: #C0392B;
+    --success: #2E7D52;
+    --warning: #C97D20;
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘DM Sans’, sans-serif;
+background: var(–cream);
+color: var(–ink);
+min-height: 100vh;
+font-size: 15px;
+line-height: 1.6;
+}
+
+/* LOGIN */
+#login-screen {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+background: var(–ink);
+position: relative;
+overflow: hidden;
+}
+
+#login-screen::before {
+content: ‘’;
+position: absolute;
+width: 600px; height: 600px;
+background: radial-gradient(circle, rgba(212,113,74,0.15) 0%, transparent 70%);
+top: -100px; right: -100px;
+border-radius: 50%;
+}
+
+#login-screen::after {
+content: ‘’;
+position: absolute;
+width: 400px; height: 400px;
+background: radial-gradient(circle, rgba(122,158,135,0.12) 0%, transparent 70%);
+bottom: -50px; left: -50px;
+border-radius: 50%;
+}
+
+.login-box {
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 20px;
+padding: 56px 48px;
+width: 100%;
+max-width: 420px;
+position: relative;
+z-index: 1;
+backdrop-filter: blur(10px);
+}
+
+.login-logo {
+font-family: ‘DM Serif Display’, serif;
+font-size: 28px;
+color: white;
+margin-bottom: 6px;
+letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+color: rgba(255,255,255,0.45);
+font-size: 13px;
+font-weight: 300;
+margin-bottom: 40px;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+}
+
+.login-field {
+margin-bottom: 20px;
+}
+
+.login-field label {
+display: block;
+color: rgba(255,255,255,0.55);
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.login-field input {
+width: 100%;
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 10px;
+padding: 13px 16px;
+color: white;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+outline: none;
+transition: border-color 0.2s;
+}
+
+.login-field input:focus {
+border-color: var(–accent);
+}
+
+.login-field input::placeholder { color: rgba(255,255,255,0.2); }
+
+.btn-login {
+width: 100%;
+background: var(–accent);
+color: white;
+border: none;
+border-radius: 10px;
+padding: 14px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+margin-top: 8px;
+transition: opacity 0.2s;
+letter-spacing: 0.3px;
+}
+
+.btn-login:hover { opacity: 0.88; }
+
+.login-error {
+color: #FF8A75;
+font-size: 13px;
+margin-top: 14px;
+text-align: center;
+display: none;
+}
+
+/* MAIN APP */
+#app { display: none; }
+
+.topbar {
+background: var(–ink);
+padding: 0 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+height: 58px;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.topbar-brand {
+font-family: ‘DM Serif Display’, serif;
+color: white;
+font-size: 20px;
+letter-spacing: -0.3px;
+}
+
+.topbar-brand span {
+color: var(–accent);
+}
+
+.topbar-nav {
+display: flex;
+gap: 4px;
+}
+
+.nav-btn {
+background: transparent;
+border: none;
+color: rgba(255,255,255,0.5);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 500;
+padding: 7px 14px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+background: rgba(255,255,255,0.08);
+color: white;
+}
+
+.nav-btn.active { color: var(–accent-light); }
+
+.topbar-user {
+display: flex;
+align-items: center;
+gap: 10px;
+color: rgba(255,255,255,0.5);
+font-size: 13px;
+}
+
+.btn-logout {
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.1);
+color: rgba(255,255,255,0.6);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 12px;
+padding: 5px 12px;
+border-radius: 6px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.btn-logout:hover { background: rgba(255,255,255,0.12); color: white; }
+
+/* VIEWS */
+.view { display: none; padding: 40px 32px; max-width: 900px; margin: 0 auto; }
+.view.active { display: block; }
+
+/* GENERATE VIEW */
+.view-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 32px;
+color: var(–ink);
+margin-bottom: 6px;
+letter-spacing: -0.5px;
+}
+
+.view-desc {
+color: var(–muted);
+font-size: 14px;
+margin-bottom: 36px;
+font-weight: 300;
+}
+
+.form-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+.form-full { grid-column: 1 / -1; }
+
+.field-group {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.field-group label {
+font-size: 11px;
+font-weight: 600;
+letter-spacing: 0.8px;
+text-transform: uppercase;
+color: var(–warm-mid);
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 10px;
+padding: 11px 14px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+color: var(–ink);
+outline: none;
+transition: border-color 0.2s;
+width: 100%;
+}
+
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+border-color: var(–accent);
+box-shadow: 0 0 0 3px rgba(212,113,74,0.1);
+}
+
+.field-group textarea {
+resize: vertical;
+min-height: 100px;
+line-height: 1.5;
+}
+
+.field-hint {
+font-size: 11px;
+color: var(–muted);
+font-weight: 300;
+}
+
+.section-divider {
+height: 1px;
+background: var(–border);
+margin: 28px 0;
+position: relative;
+}
+
+.section-divider span {
+position: absolute;
+top: 50%; left: 0;
+transform: translateY(-50%);
+background: var(–cream);
+padding: 0 12px 0 0;
+font-size: 11px;
+font-weight: 600;
+letter-spacing: 1px;
+text-transform: uppercase;
+color: var(–warm-mid);
+}
+
+/* PARENT TYPE SELECTOR */
+.parent-type-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+}
+
+.parent-type-option {
+position: relative;
+}
+
+.parent-type-option input[type=“radio”] {
+position: absolute;
+opacity: 0;
+width: 0; height: 0;
+}
+
+.parent-type-option label {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+padding: 14px 12px;
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 12px;
+cursor: pointer;
+transition: all 0.2s;
+text-align: center;
+text-transform: none;
+letter-spacing: 0;
+font-size: 13px;
+font-weight: 500;
+color: var(–muted);
+}
+
+.parent-type-option input:checked + label {
+border-color: var(–accent);
+background: rgba(212,113,74,0.06);
+color: var(–accent);
+}
+
+.parent-type-option label .emoji {
+font-size: 20px;
+line-height: 1;
+}
+
+/* UPLOAD PREVIOUS REPORT */
+.upload-zone {
+border: 1.5px dashed var(–border);
+border-radius: 12px;
+padding: 24px;
+text-align: center;
+background: var(–card);
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+}
+
+.upload-zone:hover { border-color: var(–accent); background: rgba(212,113,74,0.03); }
+
+.upload-zone input[type=“file”] {
+position: absolute;
+inset: 0;
+opacity: 0;
+cursor: pointer;
+width: 100%; height: 100%;
+border: none;
+padding: 0;
+}
+
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(–muted); }
+.upload-text strong { color: var(–ink); }
+
+.uploaded-file {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 14px;
+background: var(–sage-light);
+border-radius: 8px;
+font-size: 13px;
+color: var(–success);
+font-weight: 500;
+}
+
+/* REPORT TYPE */
+.report-type-toggle {
+display: flex;
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 10px;
+padding: 4px;
+gap: 4px;
+}
+
+.report-type-toggle button {
+flex: 1;
+background: transparent;
+border: none;
+padding: 9px 16px;
+border-radius: 7px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 500;
+cursor: pointer;
+color: var(–muted);
+transition: all 0.2s;
+}
+
+.report-type-toggle button.active {
+background: var(–ink);
+color: white;
+}
+
+/* GENERATE BTN */
+.btn-generate {
+background: var(–accent);
+color: white;
+border: none;
+border-radius: 12px;
+padding: 16px 40px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s;
+display: flex;
+align-items: center;
+gap: 10px;
+letter-spacing: 0.2px;
+}
+
+.btn-generate:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* LOADING */
+.loading-bar {
+display: none;
+margin: 24px 0;
+padding: 20px 24px;
+background: var(–card);
+border-radius: 12px;
+border: 1.5px solid var(–border);
+}
+
+.loading-bar.active { display: flex; align-items: center; gap: 16px; }
+
+.spinner {
+width: 22px; height: 22px;
+border: 2.5px solid var(–border);
+border-top-color: var(–accent);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text { font-size: 14px; color: var(–muted); }
+.loading-text strong { color: var(–ink); display: block; }
+
+/* RESULTS */
+#results-area { display: none; margin-top: 36px; }
+
+.results-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 24px;
+}
+
+.results-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 22px;
+color: var(–ink);
+}
+
+.btn-save {
+background: var(–sage);
+color: white;
+border: none;
+border-radius: 10px;
+padding: 10px 22px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 7px;
+transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.85; }
+
+.report-section-card {
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 14px;
+margin-bottom: 16px;
+overflow: hidden;
+}
+
+.report-section-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 16px 20px;
+background: #F5F1EB;
+border-bottom: 1px solid var(–border);
+}
+
+.section-label {
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 1px;
+text-transform: uppercase;
+color: var(–warm-mid);
+}
+
+.btn-copy {
+background: transparent;
+border: 1.5px solid var(–border);
+border-radius: 7px;
+padding: 5px 14px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 12px;
+font-weight: 500;
+cursor: pointer;
+color: var(–muted);
+transition: all 0.2s;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+
+.btn-copy:hover { border-color: var(–sage); color: var(–success); }
+.btn-copy.copied { border-color: var(–sage); color: var(–success); background: var(–sage-light); }
+
+.report-section-body {
+padding: 20px;
+}
+
+.report-text {
+font-size: 14px;
+line-height: 1.75;
+color: var(–ink);
+white-space: pre-wrap;
+}
+
+.alert-banner {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+padding: 14px 18px;
+border-radius: 10px;
+margin-bottom: 16px;
+font-size: 13px;
+}
+
+.alert-banner.info {
+background: rgba(212,113,74,0.08);
+border: 1px solid rgba(212,113,74,0.2);
+color: var(–accent);
+}
+
+.alert-banner.warning {
+background: rgba(201,125,32,0.08);
+border: 1px solid rgba(201,125,32,0.2);
+color: var(–warning);
+}
+
+/* HISTORY VIEW */
+.history-filters {
+display: flex;
+gap: 12px;
+margin-bottom: 24px;
+flex-wrap: wrap;
+}
+
+.history-filters select {
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 8px;
+padding: 8px 12px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+color: var(–ink);
+outline: none;
+cursor: pointer;
+}
+
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+
+.history-item {
+background: var(–card);
+border: 1.5px solid var(–border);
+border-radius: 14px;
+padding: 20px 24px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+transition: border-color 0.2s;
+}
+
+.history-item:hover { border-color: var(–warm-mid); }
+
+.history-item-info { flex: 1; }
+
+.history-student {
+font-size: 16px;
+font-weight: 600;
+color: var(–ink);
+margin-bottom: 4px;
+}
+
+.history-meta {
+display: flex;
+gap: 16px;
+font-size: 12px;
+color: var(–muted);
+flex-wrap: wrap;
+}
+
+.history-meta span {
+display: flex;
+align-items: center;
+gap: 4px;
+}
+
+.badge {
+display: inline-block;
+padding: 2px 10px;
+border-radius: 100px;
+font-size: 11px;
+font-weight: 600;
+}
+
+.badge-course {
+background: var(–accent-light);
+color: var(–accent);
+}
+
+.badge-term {
+background: var(–sage-light);
+color: var(–success);
+}
+
+.badge-final {
+background: rgba(26,23,20,0.08);
+color: var(–ink);
+}
+
+.history-actions { display: flex; gap: 8px; }
+
+.btn-sm {
+background: transparent;
+border: 1.5px solid var(–border);
+border-radius: 8px;
+padding: 6px 14px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 12px;
+font-weight: 500;
+cursor: pointer;
+color: var(–muted);
+transition: all 0.2s;
+}
+.btn-sm:hover { border-color: var(–accent); color: var(–accent); }
+.btn-sm.danger:hover { border-color: var(–danger); color: var(–danger); }
+
+/* MODAL */
+.modal-overlay {
+position: fixed;
+inset: 0;
+background: rgba(26,23,20,0.6);
+z-index: 200;
+display: none;
+align-items: center;
+justify-content: center;
+padding: 20px;
+backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal-box {
+background: white;
+border-radius: 20px;
+width: 100%;
+max-width: 720px;
+max-height: 85vh;
+overflow-y: auto;
+padding: 36px;
+}
+
+.modal-header {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+margin-bottom: 28px;
+}
+
+.modal-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 22px;
+color: var(–ink);
+}
+
+.modal-subtitle { font-size: 13px; color: var(–muted); margin-top: 4px; }
+
+.btn-close-modal {
+background: var(–cream);
+border: none;
+width: 32px; height: 32px;
+border-radius: 50%;
+font-size: 18px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+color: var(–muted);
+flex-shrink: 0;
+transition: all 0.2s;
+}
+.btn-close-modal:hover { background: var(–border); color: var(–ink); }
+
+/* EMPTY STATE */
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(–muted);
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-family: ‘DM Serif Display’, serif; font-size: 22px; color: var(–ink); margin-bottom: 8px; }
+.empty-desc { font-size: 14px; font-weight: 300; }
+
+/* COURSE INFO CARDS */
+.course-info-panel {
+display: none;
+background: rgba(212,113,74,0.05);
+border: 1px solid rgba(212,113,74,0.15);
+border-radius: 12px;
+padding: 16px 20px;
+margin-top: 12px;
+font-size: 13px;
+color: var(–ink);
+line-height: 1.6;
+}
+
+.course-info-panel.visible { display: block; }
+.course-info-panel strong { color: var(–accent); }
+
+@media (max-width: 640px) {
+.form-grid { grid-template-columns: 1fr; }
+.parent-type-grid { grid-template-columns: repeat(2, 1fr); }
+.view { padding: 24px 16px; }
+.topbar { padding: 0 16px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Term Reports</div>
+    <div class="login-subtitle">Kids&amp;Us · Accesso insegnanti</div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="tua@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="handleLogin()">Accedi →</button>
+    <div class="login-error" id="login-error">Credenziali non valide</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">Term<span>Reports</span></div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" onclick="showView('generate', this)">✦ Genera</button>
+      <button class="nav-btn" onclick="showView('history', this)">◈ Storico</button>
+    </div>
+    <div class="topbar-user">
+      <span id="user-name-display">Chiara</span>
+      <button class="btn-logout" onclick="handleLogout()">Esci</button>
+    </div>
+  </div>
+
+  <!-- GENERATE VIEW -->
+
+  <div class="view active" id="view-generate">
+    <div class="view-title">Genera Term Report</div>
+    <div class="view-desc">Inserisci i follow-up dello studente e le note integrative per generare il report personalizzato.</div>
+
+```
+<div class="form-grid">
+  <div class="field-group">
+    <label>Nome studente</label>
+    <input type="text" id="student-name" placeholder="es. Aurora Avitabile">
+  </div>
+  <div class="field-group">
+    <label>Corso</label>
+    <select id="course-select" onchange="onCourseChange()">
+      <option value="">— Seleziona corso —</option>
+      <option value="mousy">Mousy</option>
+      <option value="linda">Linda</option>
+      <option value="sam">Sam</option>
+      <option value="emma">Emma</option>
+      <option value="oliver">Oliver</option>
+      <option value="marcia">Marcia</option>
+      <option value="pam_paul">Pam &amp; Paul</option>
+      <option value="ben_brenda">Ben &amp; Brenda</option>
+    </select>
+    <div class="course-info-panel" id="course-info-panel"></div>
+  </div>
+  <div class="field-group">
+    <label>Trimestre</label>
+    <select id="trimestre-select">
+      <option value="T1">T1 — Primo trimestre</option>
+      <option value="T2">T2 — Secondo trimestre</option>
+      <option value="T3">T3 — Terzo trimestre</option>
+    </select>
+  </div>
+  <div class="field-group">
+    <label>Genere studente</label>
+    <select id="gender-select">
+      <option value="M">Maschio</option>
+      <option value="F">Femmina</option>
+    </select>
+  </div>
+</div>
+
+<!-- REPORT TYPE -->
+<div class="form-grid">
+  <div class="field-group">
+    <label>Tipo di report</label>
+    <div class="report-type-toggle">
+      <button class="active" id="btn-trimestrale" onclick="setReportType('trimestrale')">Trimestrale</button>
+      <button id="btn-finale" onclick="setReportType('finale')">Finale (con valutazione annuale)</button>
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Oral test</label>
+    <input type="text" id="oral-test" placeholder="es. Superato con ottimi risultati / Non ancora svolto">
+  </div>
+</div>
+
+<div class="section-divider"><span>Tipologia genitore</span></div>
+
+<!-- PARENT TYPE -->
+<div class="field-group" style="margin-bottom: 20px;">
+  <label>Come è il genitore?</label>
+  <div class="parent-type-grid">
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-standard" value="standard" checked>
+      <label for="pt-standard"><span class="emoji">😊</span>Standard</label>
+    </div>
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-permaloso" value="permaloso">
+      <label for="pt-permaloso"><span class="emoji">😤</span>Permaloso / Suscettibile</label>
+    </div>
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-pignolo" value="pignolo">
+      <label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo / Esigente</label>
+    </div>
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-ansioso" value="ansioso">
+      <label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label>
+    </div>
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-entusiasta" value="entusiasta">
+      <label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label>
+    </div>
+    <div class="parent-type-option">
+      <input type="radio" name="parent-type" id="pt-distaccato" value="distaccato">
+      <label for="pt-distaccato"><span class="emoji">😶</span>Distaccato / Critico</label>
+    </div>
+  </div>
+  <div class="field-hint" style="margin-top:8px">Questa informazione guida il tono del report. Non verrà inclusa nel testo finale.</div>
+</div>
+
+<div class="field-group" style="margin-bottom: 20px;">
+  <label>Note integrative</label>
+  <textarea id="extra-notes" placeholder="es. La mamma tende ad essere sempre molto apprensiva, meglio rassicurarla. / Il bambino ha avuto un periodo difficile in famiglia..."></textarea>
+  <div class="field-hint">Queste note guidano l'AI nella stesura ma non vengono citate letteralmente nel report.</div>
+</div>
+
+<div class="section-divider"><span>Follow-up giornalieri</span></div>
+
+<div class="field-group" style="margin-bottom: 20px;">
+  <label>Follow-up lezioni (copia-incolla dai tuoi appunti)</label>
+  <textarea id="followups" style="min-height: 180px;" placeholder="Incolla qui tutti i follow-up delle lezioni del trimestre. Es:
+```
+
+12/01 - Oggi Aurora era molto vivace, ha ripetuto ‘red’ e ‘blue’ spontaneamente. Ha avuto un momento di difficoltà con la nuova storia ma si è ripresa.
+19/01 - Ottima lezione, ha partecipato attivamente alle canzoni…
+…”></textarea>
+</div>
+
+```
+<!-- PREVIOUS REPORTS -->
+<div class="section-divider"><span>Report precedenti (opzionale)</span></div>
+
+<div class="field-group" style="margin-bottom: 28px;">
+  <label>Carica report precedente per garantire continuità</label>
+  <div class="upload-zone" id="upload-zone">
+    <input type="file" id="prev-report-file" accept=".txt,.pdf,.docx" onchange="handleFileUpload(this)">
+    <div class="upload-icon">📄</div>
+    <div class="upload-text"><strong>Clicca o trascina</strong> il report precedente qui</div>
+    <div class="upload-text" style="margin-top:4px; font-size:12px;">Oppure incolla il testo nel campo sottostante</div>
+  </div>
+  <div class="uploaded-file" id="uploaded-file-info" style="display:none; margin-top:10px;">
+    <span>✓</span><span id="uploaded-file-name"></span>
+    <button onclick="clearUpload()" style="margin-left:auto; background:none; border:none; cursor:pointer; color:var(--success);">✕</button>
+  </div>
+  <textarea id="prev-report-text" style="margin-top:10px; min-height:80px;" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
+</div>
+
+<button class="btn-generate" onclick="generateReport()" id="generate-btn">
+  <span>✦</span> Genera Report
+</button>
+
+<!-- LOADING -->
+<div class="loading-bar" id="loading-bar">
+  <div class="spinner"></div>
+  <div class="loading-text">
+    <strong id="loading-msg">Elaborazione in corso...</strong>
+    <span>L'AI sta analizzando i follow-up e personalizzando il report</span>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results-area">
+  <div class="results-header">
+    <div class="results-title">📋 Report generato</div>
+    <button class="btn-save" onclick="saveToHistory()">
+      <span>◈</span> Salva nello storico
+    </button>
+  </div>
+  <div id="alert-container"></div>
+  <div id="sections-container"></div>
+</div>
+```
+
+  </div>
+
+  <!-- HISTORY VIEW -->
+
+  <div class="view" id="view-history">
+    <div class="view-title">Storico Report</div>
+    <div class="view-desc">Tutti i report salvati, organizzati per studente e trimestre.</div>
+
+```
+<div class="history-filters">
+  <select id="filter-course" onchange="renderHistory()">
+    <option value="">Tutti i corsi</option>
+    <option value="mousy">Mousy</option>
+    <option value="linda">Linda</option>
+    <option value="sam">Sam</option>
+    <option value="emma">Emma</option>
+    <option value="oliver">Oliver</option>
+    <option value="marcia">Marcia</option>
+    <option value="pam_paul">Pam &amp; Paul</option>
+    <option value="ben_brenda">Ben &amp; Brenda</option>
+  </select>
+  <select id="filter-term" onchange="renderHistory()">
+    <option value="">Tutti i trimestri</option>
+    <option value="T1">T1</option>
+    <option value="T2">T2</option>
+    <option value="T3">T3</option>
+  </select>
+  <input type="text" id="filter-name" placeholder="Cerca per nome..." 
+         style="background:white; border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--ink); outline:none;"
+         oninput="renderHistory()">
+</div>
+
+<div class="history-list" id="history-list"></div>
+```
+
+  </div>
+</div>
+
+<!-- MODAL: VIEW HISTORY ITEM -->
+
+<div class="modal-overlay" id="modal-view" onclick="closeModal('modal-view')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-student-name">—</div>
+        <div class="modal-subtitle" id="modal-meta">—</div>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal('modal-view')">✕</button>
+    </div>
+    <div id="modal-sections-container"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// AUTH - Simple credential check (customize here)
+// ═══════════════════════════════════════════════════
+const CREDENTIALS = {
+  "chiara.marchese@kidsandus.it": "KidsUs2025!",
+  "admin": "admin123"
+};
+
+let currentUser = null;
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  
+  if (CREDENTIALS[email] === pass) {
+    currentUser = email;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-name-display').textContent = email.split('.')[0].charAt(0).toUpperCase() + email.split('.')[0].slice(1);
+    renderHistory();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    setTimeout(() => document.getElementById('login-error').style.display = 'none', 3000);
+  }
+}
+
+function handleLogout() {
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// Enter key on login
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function showView(viewId, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  btn.classList.add('active');
+  if (viewId === 'history') renderHistory();
+}
+
+// ═══════════════════════════════════════════════════
+// COURSE INFO
+// ═══════════════════════════════════════════════════
+const COURSE_INFO = {
+  mousy: {
+    label: "Mousy — Babies (0–2 anni)",
+    desc: "Familiarizzazione con l'inglese. Comprensione semplici istruzioni. Prime parole: Hello, Bye-bye, Please, Thank you. I genitori partecipano alla lezione. Focus su: suoni, canzoni, routine, parti del corpo, colori, animali."
+  },
+  linda: {
+    label: "Linda — Babies/Toddlers (1,5–3 anni)",
+    desc: "Inizia a mettere insieme 2–3 parole. Espressioni quotidiane: saluti, presentazioni, ringraziamenti. Vocabolario: corpo, azioni, colori, dimensioni. I genitori sono presenti. Il bambino inizia a riprodurre strutture."
+  },
+  sam: {
+    label: "Sam — Kids (2,5–4 anni)",
+    desc: "Comprensione globale delle storie. Saluti, presentazione (nome, età), stati d'animo. Descrizione oggetti (colore, dimensione). 'Can I have... please?'. Vocabolario: routine, azioni, animali, alimenti."
+  },
+  emma: {
+    label: "Emma — Kids (3–5 anni)",
+    desc: "Comunicazione con strutture brevi: 'It's rainy', 'Emma can eat in the kitchen'. Comprensione delle storie. Presentazione completa (nome, età, stato d'animo). Preferenze: 'I like strawberries'. Storie della personaggioEmma."
+  },
+  oliver: {
+    label: "Oliver — Kids (4–6 anni)",
+    desc: "Produzione di frasi più articolate. Strutture per chiedere/rispondere. Comprensione estesa. Vocabolario più ricco. Lavoro sul workbook con maggiore autonomia."
+  },
+  marcia: {
+    label: "Marcia — Junior (5–7 anni)",
+    desc: "Strutture comunicative più complesse. Lettura/scrittura iniziale. Autonomia nelle attività. Comprensione di istruzioni elaborate. Maggiore produzione orale."
+  },
+  pam_paul: {
+    label: "Pam & Paul — Junior (6–8 anni)",
+    desc: "Corso avanzato. Lettura, scrittura, grammatica di base. Conversazione strutturata. Uso del workbook autonomo."
+  },
+  ben_brenda: {
+    label: "Ben & Brenda — Pre-teens (8–11 anni)",
+    desc: "Livello intermedio. Abilità integrate (lettura, scrittura, ascolto, parlato). Grammatica, vocabolario tematico, comprensione testi."
+  }
+};
+
+function onCourseChange() {
+  const course = document.getElementById('course-select').value;
+  const panel = document.getElementById('course-info-panel');
+  if (course && COURSE_INFO[course]) {
+    const info = COURSE_INFO[course];
+    panel.innerHTML = `<strong>${info.label}</strong><br>${info.desc}`;
+    panel.classList.add('visible');
+  } else {
+    panel.classList.remove('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// REPORT TYPE
+// ═══════════════════════════════════════════════════
+let reportType = 'trimestrale';
+
+function setReportType(type) {
+  reportType = type;
+  document.getElementById('btn-trimestrale').classList.toggle('active', type === 'trimestrale');
+  document.getElementById('btn-finale').classList.toggle('active', type === 'finale');
+}
+
+// ═══════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════
+let uploadedFileContent = '';
+
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  document.getElementById('uploaded-file-name').textContent = file.name;
+  document.getElementById('uploaded-file-info').style.display = 'flex';
+  
+  const reader = new FileReader();
+  reader.onload = (e) => { uploadedFileContent = e.target.result; };
+  reader.readAsText(file);
+}
+
+function clearUpload() {
+  uploadedFileContent = '';
+  document.getElementById('uploaded-file-info').style.display = 'none';
+  document.getElementById('prev-report-file').value = '';
+}
+
+// ═══════════════════════════════════════════════════
+// GENERATE REPORT
+// ═══════════════════════════════════════════════════
+let currentReport = null;
+
+const LOADING_MESSAGES = [
+  "Analisi dei follow-up in corso...",
+  "Personalizzazione del tono sul tipo di genitore...",
+  "Stesura delle sezioni del report...",
+  "Revisione della qualità linguistica..."
+];
+
+async function generateReport() {
+  const studentName = document.getElementById('student-name').value.trim();
+  const course = document.getElementById('course-select').value;
+  const trimestre = document.getElementById('trimestre-select').value;
+  const gender = document.getElementById('gender-select').value;
+  const oralTest = document.getElementById('oral-test').value.trim();
+  const followups = document.getElementById('followups').value.trim();
+  const extraNotes = document.getElementById('extra-notes').value.trim();
+  const parentType = document.querySelector('input[name="parent-type"]:checked').value;
+  const prevReport = uploadedFileContent || document.getElementById('prev-report-text').value.trim();
+
+  if (!studentName || !course || !followups) {
+    alert('Compila almeno: nome studente, corso e follow-up delle lezioni.');
+    return;
+  }
+
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+  document.getElementById('loading-bar').classList.add('active');
+  document.getElementById('results-area').style.display = 'none';
+
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    document.getElementById('loading-msg').textContent = LOADING_MESSAGES[msgIdx % LOADING_MESSAGES.length];
+    msgIdx++;
+  }, 2500);
+
+  try {
+    const courseInfo = COURSE_INFO[course];
+    const pronome = gender === 'M' ? 'lui/il bambino' : 'lei/la bambina';
+    const pronome2 = gender === 'M' ? 'Lo' : 'La';
+    const articolo = gender === 'M' ? 'il' : 'la';
+    const finaleInstructions = reportType === 'finale' ? `
+- SEZIONE AGGIUNTIVA "Valutazione generale anno scolastico": Fornisci un giudizio complessivo sull'anno, evidenziando i progressi fatti dal primo al terzo trimestre, il livello raggiunto, e dai consigli pratici per l'estate (es. ascolto audio, routine, attività per mantenere/migliorare quanto appreso) in vista dell'anno successivo.` : '';
+
+    const parentGuidance = {
+      standard: "Tono professionale, caldo e rassicurante. Bilancia aspetti positivi e aree di miglioramento in modo diretto.",
+      permaloso: "Tono molto diplomatico e rassicurante. Qualsiasi aspetto critico va incorniciato come opportunità di crescita, mai come problema. Sottolinea moltissimo i progressi. Evita qualsiasi formulazione che possa essere percepita come critica.",
+      pignolo: "Tono preciso, dettagliato e professionale. Il genitore vuole informazioni concrete e specifiche. Usa esempi precisi. Spiega le strategie didattiche. Sii puntuale e metodico.",
+      ansioso: "Tono molto rassicurante e positivo. Ogni possibile preoccupazione deve essere subito bilanciata da una rassicurazione. Sottolinea che tutto è sotto controllo e che le strategie sono già in atto.",
+      entusiasta: "Tono caldo ed energico. Il genitore è già motivato, quindi puoi essere più diretto nel condividere anche le sfide, sapendo che le accoglierà positivamente.",
+      distaccato: "Tono formale e molto professionale. Fatti concreti, progressi misurabili, strategie chiare. Meno calore, più sostanza e precisione."
+    };
+
+    const systemPrompt = `Sei un'esperta insegnante di inglese di Kids&Us con anni di esperienza nella redazione di term report per bambini. 
+Scrivi SEMPRE in italiano perfetto e naturale, come farebbe una madrelingua italiana colta. 
+EVITA assolutamente traduzioni letterali dall'inglese o frasi innaturali in italiano.
+Usa un registro professionale ma accessibile ai genitori.
+Il report è scritto in terza persona (es. "Aurora partecipa attivamente...") oppure con "noi" del plurale scolastico.
+NON usare la prima persona singolare della insegnante.
+NON menzionare mai il tipo di genitore nel testo.
+NON fare riferimento alle note interne nel testo del report.
+Ogni sezione deve essere di 3-5 righe ben scritte, personalizzate e specifiche per questo studente.
+Rispondi SOLO con JSON valido, nessun testo prima o dopo.`;
+
+    const userPrompt = `Genera un term report Kids&Us per il seguente studente:
+
+DATI STUDENTE:
+- Nome: ${studentName}
+- Corso: ${courseInfo.label}
+- Trimestre: ${trimestre}
+- Genere: ${gender === 'M' ? 'Maschio' : 'Femmina'}
+- Anno scolastico: 2024/2025
+
+OBIETTIVI DEL CORSO:
+${courseInfo.desc}
+
+FOLLOW-UP LEZIONI:
+${followups}
+
+ORAL TEST: ${oralTest || 'Non specificato'}
+
+NOTE INTERNE (NON citarle nel report, usale solo per guidare il tono e i contenuti):
+- Tipo di genitore: ${parentType} → ${parentGuidance[parentType]}
+- Note integrative: ${extraNotes || 'Nessuna nota aggiuntiva'}
+
+${prevReport ? `REPORT PRECEDENTE (mantieni continuità ed evidenzia eventuali progressi/cambiamenti rispetto a questo):
+${prevReport.substring(0, 2000)}` : ''}
+
+Genera il report con le seguenti sezioni. Ogni sezione deve essere testo fluido e naturale in italiano, NON bullet points:
+
+Rispondi con questo JSON esatto:
+{
+  "motivazione_partecipazione": "testo della sezione...",
+  "apprendimento": "testo della sezione...",
+  "comportamento": "testo della sezione...",
+  "oral_test": "testo commento oral test..."${reportType === 'finale' ? ',\n  "valutazione_annuale": "testo valutazione generale con consigli estate..."' : ''}
+}`;
+
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1800,
+        messages: [
+          { role: "user", content: userPrompt }
+        ],
+        system: systemPrompt
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok || !data.content) {
+      throw new Error(data.error?.message || 'Errore API');
+    }
+
+    const rawText = data.content.find(b => b.type === 'text')?.text || '';
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Formato risposta non valido');
+    
+    const sections = JSON.parse(jsonMatch[0]);
+
+    currentReport = {
+      id: Date.now().toString(),
+      studentName,
+      course,
+      trimestre,
+      gender,
+      parentType,
+      oralTest,
+      reportType,
+      date: new Date().toLocaleDateString('it-IT'),
+      sections
+    };
+
+    renderResults(sections);
+
+  } catch (err) {
+    alert('Errore durante la generazione: ' + err.message);
+    console.error(err);
+  } finally {
+    clearInterval(msgInterval);
+    btn.disabled = false;
+    document.getElementById('loading-bar').classList.remove('active');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════════════════
+const SECTION_LABELS = {
+  motivazione_partecipazione: "Motivazione e partecipazione",
+  apprendimento: "Apprendimento",
+  comportamento: "Comportamento",
+  oral_test: "Oral test",
+  valutazione_annuale: "Valutazione generale anno scolastico"
+};
+
+function renderResults(sections) {
+  const area = document.getElementById('results-area');
+  const alertContainer = document.getElementById('alert-container');
+  const container = document.getElementById('sections-container');
+
+  alertContainer.innerHTML = `
+    <div class="alert-banner info">
+      <span>✦</span>
+      <span>Report generato con successo. Clicca <strong>"Copia"</strong> su ogni sezione per incollarla sulla piattaforma Kids&Us.</span>
+    </div>`;
+
+  container.innerHTML = '';
+
+  for (const [key, text] of Object.entries(sections)) {
+    const label = SECTION_LABELS[key] || key;
+    const card = document.createElement('div');
+    card.className = 'report-section-card';
+    card.innerHTML = `
+      <div class="report-section-header">
+        <span class="section-label">${label}</span>
+        <button class="btn-copy" onclick="copySection(this, '${key}')">
+          <span>⎘</span> Copia
+        </button>
+      </div>
+      <div class="report-section-body">
+        <div class="report-text" id="text-${key}">${escapeHtml(text)}</div>
+      </div>`;
+    container.appendChild(card);
+  }
+
+  area.style.display = 'block';
+  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copySection(btn, key) {
+  const text = document.getElementById('text-' + key).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> Copiato!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<span>⎘</span> Copia';
+    }, 2000);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ═══════════════════════════════════════════════════
+// HISTORY (localStorage)
+// ═══════════════════════════════════════════════════
+function getHistory() {
+  try {
+    const data = sessionStorage.getItem('tr_history');
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function saveHistory(items) {
+  sessionStorage.setItem('tr_history', JSON.stringify(items));
+}
+
+function saveToHistory() {
+  if (!currentReport) return;
+  const history = getHistory();
+  history.unshift(currentReport);
+  saveHistory(history);
+  
+  const btn = document.querySelector('.btn-save');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span>✓</span> Salvato!';
+  btn.style.background = 'var(--success)';
+  setTimeout(() => {
+    btn.innerHTML = orig;
+    btn.style.background = 'var(--sage)';
+  }, 2000);
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  let items = getHistory();
+
+  const filterCourse = document.getElementById('filter-course').value;
+  const filterTerm = document.getElementById('filter-term').value;
+  const filterName = document.getElementById('filter-name').value.toLowerCase();
+
+  if (filterCourse) items = items.filter(i => i.course === filterCourse);
+  if (filterTerm) items = items.filter(i => i.trimestre === filterTerm);
+  if (filterName) items = items.filter(i => i.studentName.toLowerCase().includes(filterName));
+
+  if (items.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">◈</div>
+        <div class="empty-title">Nessun report salvato</div>
+        <div class="empty-desc">Genera un report e salvalo per trovarlo qui.</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map((item, idx) => `
+    <div class="history-item">
+      <div class="history-item-info">
+        <div class="history-student">${item.studentName}</div>
+        <div class="history-meta">
+          <span><span class="badge badge-course">${COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course}</span></span>
+          <span><span class="badge badge-term">${item.trimestre}</span></span>
+          ${item.reportType === 'finale' ? '<span><span class="badge badge-final">Report finale</span></span>' : ''}
+          <span>📅 ${item.date}</span>
+        </div>
+      </div>
+      <div class="history-actions">
+        <button class="btn-sm" onclick="viewHistoryItem(${idx})">Visualizza</button>
+        <button class="btn-sm danger" onclick="deleteHistoryItem(${idx})">Elimina</button>
+      </div>
+    </div>`).join('');
+}
+
+function viewHistoryItem(idx) {
+  const items = getHistory();
+  const item = items[idx];
+  if (!item) return;
+  
+  document.getElementById('modal-student-name').textContent = item.studentName;
+  document.getElementById('modal-meta').textContent = 
+    `${COURSE_INFO[item.course]?.label || item.course} · ${item.trimestre} · ${item.date}`;
+
+  const container = document.getElementById('modal-sections-container');
+  container.innerHTML = '';
+
+  for (const [key, text] of Object.entries(item.sections)) {
+    const label = SECTION_LABELS[key] || key;
+    const div = document.createElement('div');
+    div.className = 'report-section-card';
+    div.style.marginBottom = '14px';
+    div.innerHTML = `
+      <div class="report-section-header">
+        <span class="section-label">${label}</span>
+        <button class="btn-copy" onclick="copyText(this, \`${text.replace(/`/g, '\\`')}\`)">
+          <span>⎘</span> Copia
+        </button>
+      </div>
+      <div class="report-section-body">
+        <div class="report-text">${escapeHtml(text)}</div>
+      </div>`;
+    container.appendChild(div);
+  }
+
+  document.getElementById('modal-view').classList.add('active');
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> Copiato!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<span>⎘</span> Copia';
+    }, 2000);
+  });
+}
+
+function deleteHistoryItem(idx) {
+  if (!confirm('Eliminare questo report dallo storico?')) return;
+  const items = getHistory();
+  items.splice(idx, 1);
+  saveHistory(items);
+  renderHistory();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+</script>
+
+</body>
+</html>
