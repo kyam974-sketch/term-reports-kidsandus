@@ -136,6 +136,38 @@ app.post('/api/get-reports', async (req, res) => {
   }
 });
 
+// ── Rinomina studente ────────────────────────────────────────────────────────
+app.post('/api/rename-student', async (req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey  = process.env.SUPABASE_SERVICE_KEY;
+
+  const { token, id, newName } = req.body;
+  if (!token || !id || !newName) return res.status(400).json({ error: 'Dati mancanti.' });
+
+  try {
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': serviceKey }
+    });
+    if (!userRes.ok) return res.status(401).json({ error: 'Sessione scaduta.' });
+    const userData = await userRes.json();
+
+    const updateRes = await fetch(`${supabaseUrl}/rest/v1/reports?id=eq.${id}&user_id=eq.${userData.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceKey}`,
+        'apikey': serviceKey
+      },
+      body: JSON.stringify({ student_name: newName })
+    });
+
+    if (!updateRes.ok) return res.status(updateRes.status).json({ error: 'Errore aggiornamento.' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Errore interno.' });
+  }
+});
+
 // ── Elimina report ───────────────────────────────────────────────────────────
 app.post('/api/delete-report', async (req, res) => {
   const supabaseUrl = process.env.SUPABASE_URL;
