@@ -232,6 +232,22 @@
     .topbar { padding: 0 16px; }
     .user-email { display: none; }
   }
+
+  /* Student folder modal */
+  .student-timeline { display: flex; flex-direction: column; gap: 12px; }
+  .timeline-item { 
+    background: var(--cream); border: 1.5px solid var(--border); 
+    border-radius: 12px; padding: 16px 20px; 
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .timeline-term { font-weight: 700; color: var(--ink); font-size: 14px; }
+  .timeline-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .rename-input {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 8px; padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--ink); outline: none; width: 100%;
+  }
 </style>
 </head>
 <body>
@@ -477,6 +493,35 @@
       <button class="btn-close-modal" onclick="closeModal()">✕</button>
     </div>
     <div id="modal-sections-container"></div>
+  </div>
+</div>
+
+<!-- MODAL: cartella studente -->
+<div class="modal-overlay" id="modal-student" onclick="closeStudentModal()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:800px">
+    <div class="modal-header">
+      <div style="flex:1">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="modal-title" id="student-folder-name"></div>
+          <button onclick="startRename()" style="background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:4px 12px; font-size:12px; cursor:pointer; color:var(--muted); font-family:'DM Sans',sans-serif;">✏️ Rinomina</button>
+        </div>
+        <div id="rename-area" style="display:none; margin-top:10px; display:none;">
+          <input type="text" class="rename-input" id="rename-input" placeholder="Nuovo nome...">
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button onclick="confirmRename()" class="btn-save" style="padding:8px 16px; font-size:13px;">✓ Salva</button>
+            <button onclick="cancelRename()" class="btn-sm" style="padding:8px 16px;">Annulla</button>
+          </div>
+        </div>
+        <div class="modal-subtitle" id="student-folder-meta"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-start;">
+        <button onclick="useStudentForNewReport()" class="btn-generate" style="padding:10px 18px; font-size:13px; border-radius:10px;">
+          <span>✦</span> Nuovo report
+        </button>
+        <button class="btn-close-modal" onclick="closeStudentModal()">✕</button>
+      </div>
+    </div>
+    <div class="student-timeline" id="student-timeline"></div>
   </div>
 </div>
 
@@ -889,7 +934,7 @@ function renderResults(sections) {
   document.getElementById('alert-container').innerHTML = `
     <div class="alert-banner info">
       <span>✦</span>
-      <span>Report generato. Clicca <strong>Copia</strong> su ogni sezione per incollarla nella piattaforma Kids&Us.</span>
+      <span>Report generato. Puoi <strong>modificare</strong> il testo direttamente prima di salvare. Poi clicca <strong>Copia</strong> per incollare sulla piattaforma Kids&Us.</span>
     </div>`;
 
   const container = document.getElementById('sections-container');
@@ -902,18 +947,28 @@ function renderResults(sections) {
     card.innerHTML = `
       <div class="report-section-header">
         <span class="section-label">${label}</span>
-        <button class="btn-copy" onclick="copyText(this, document.getElementById('rt-${key}').textContent)">
+        <button class="btn-copy" onclick="copyText(this, document.getElementById('rt-${key}').innerText)">
           <span>⎘</span> Copia
         </button>
       </div>
       <div class="report-section-body">
-        <div class="report-text" id="rt-${key}">${escHtml(text)}</div>
+        <div class="report-text" id="rt-${key}" contenteditable="true" 
+          style="outline:none; border-radius:8px; transition: background 0.2s;"
+          onfocus="this.style.background='#FFFBF5'; this.style.boxShadow='inset 0 0 0 2px var(--accent)'"
+          onblur="this.style.background=''; this.style.boxShadow=''; updateCurrentReport('${key}', this.innerText)"
+        >${escHtml(text)}</div>
       </div>`;
     container.appendChild(card);
   }
 
   document.getElementById('results-area').style.display = 'block';
   document.getElementById('results-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateCurrentReport(key, newText) {
+  if (currentReport && currentReport.sections) {
+    currentReport.sections[key] = newText.trim();
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1031,13 +1086,27 @@ async function loadHistory() {
   window._historyItems = {};
   items.forEach(item => { window._historyItems[item.id] = item; });
 
+  // Group by student name for folder view
+  const studentGroups = {};
+  items.forEach(item => {
+    const key = item.student_name.toLowerCase().trim();
+    if (!studentGroups[key]) studentGroups[key] = [];
+    studentGroups[key].push(item);
+  });
+
   listEl.innerHTML = items.map(item => {
     const date = new Date(item.created_at).toLocaleDateString('it-IT');
     const courseName = COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course;
+    const studentKey = item.student_name.toLowerCase().trim();
+    const reportCount = studentGroups[studentKey].length;
     return `
       <div class="history-item">
         <div style="flex:1">
-          <div class="history-student">${escHtml(item.student_name)}</div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="history-student" style="cursor:pointer; text-decoration:underline; text-decoration-color:var(--border);" 
+              onclick="openStudentFolder('${escHtml(item.student_name)}')">${escHtml(item.student_name)}</div>
+            ${reportCount > 1 ? `<span style="background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px;">${reportCount} report</span>` : ''}
+          </div>
           <div class="history-meta">
             <span class="badge badge-course">${courseName}</span>
             <span class="badge badge-term">${item.trimestre}</span>
@@ -1148,6 +1217,130 @@ function resetForm() {
   setReportType('trimestrale');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   showToast('Form azzerato — pronto per un nuovo studente!', 'success');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CARTELLA STUDENTE
+// ════════════════════════════════════════════════════════════════════════════
+let _currentStudentName = null;
+let _currentStudentItems = [];
+
+function openStudentFolder(studentName) {
+  _currentStudentName = studentName;
+  const allItems = Object.values(window._historyItems || {});
+  _currentStudentItems = allItems
+    .filter(i => i.student_name.toLowerCase().trim() === studentName.toLowerCase().trim())
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  document.getElementById('student-folder-name').textContent = studentName;
+  document.getElementById('rename-area').style.display = 'none';
+  
+  const courseName = COURSE_INFO[_currentStudentItems[0]?.course]?.label || '';
+  document.getElementById('student-folder-meta').textContent = 
+    `${courseName} · ${_currentStudentItems.length} report in archivio`;
+
+  const timeline = document.getElementById('student-timeline');
+  timeline.innerHTML = _currentStudentItems.map(item => {
+    const date = new Date(item.created_at).toLocaleDateString('it-IT');
+    return `
+      <div class="timeline-item">
+        <div style="flex:1">
+          <div class="timeline-term">${item.trimestre} — Anno ${item.created_at.substring(0,4)}</div>
+          <div class="timeline-date">${date} · ${item.report_type === 'finale' ? 'Report finale' : 'Report intermedio'}</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-sm" onclick="viewItem('${item.id}')">Visualizza</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-student').classList.add('active');
+}
+
+function closeStudentModal() {
+  document.getElementById('modal-student').classList.remove('active');
+  _currentStudentName = null;
+  _currentStudentItems = [];
+}
+
+function useStudentForNewReport() {
+  if (!_currentStudentItems.length) return;
+  const latest = _currentStudentItems[_currentStudentItems.length - 1];
+  
+  // Pre-fill form
+  document.getElementById('student-name').value = latest.student_name;
+  document.getElementById('course-select').value = latest.course;
+  document.getElementById('gender-select').value = latest.gender || 'F';
+  
+  // Set parent type
+  const ptInput = document.querySelector(`input[name="parent-type"][value="${latest.parent_type}"]`);
+  if (ptInput) ptInput.checked = true;
+
+  // Trigger course change to update trimestre options
+  onCourseChange();
+
+  // Put latest report text in previous report field
+  const sections = latest.sections;
+  const prevText = Object.entries(sections)
+    .map(([k, v]) => (SECTION_LABELS[k] || k) + ':\n' + v)
+    .join('\n\n');
+
+
+
+  document.getElementById('prev-report-text').value = prevText;
+
+  closeStudentModal();
+  
+  // Switch to generate view
+  showView('generate', document.getElementById('nav-generate'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(`Form precompilato per ${latest.student_name} — aggiungi i nuovi follow-up!`, 'success');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// RINOMINA STUDENTE
+// ════════════════════════════════════════════════════════════════════════════
+function startRename() {
+  const area = document.getElementById('rename-area');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('rename-input').value = _currentStudentName;
+  document.getElementById('rename-input').focus();
+}
+
+function cancelRename() {
+  document.getElementById('rename-area').style.display = 'none';
+}
+
+async function confirmRename() {
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName || newName === _currentStudentName) { cancelRename(); return; }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
+
+  // Update all reports for this student via server
+  const ids = _currentStudentItems.map(i => i.id);
+  let errors = 0;
+
+  for (const id of ids) {
+    const res = await fetch('/api/rename-student', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: session.access_token, id, newName })
+    });
+    if (!res.ok) errors++;
+  }
+
+  if (errors > 0) {
+    showToast('Errore durante la rinomina.', 'error');
+  } else {
+    showToast(`Rinominato in "${newName}" su ${ids.length} report!`, 'success');
+    _currentStudentName = newName;
+    document.getElementById('student-folder-name').textContent = newName;
+    cancelRename();
+    await loadHistory(); // refresh
+    openStudentFolder(newName);
+  }
 }
 
 function showToast(msg, type = '') {
