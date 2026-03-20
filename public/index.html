@@ -1027,6 +1027,10 @@ async function loadHistory() {
     return;
   }
 
+  // Store items in global map for safe access
+  window._historyItems = {};
+  items.forEach(item => { window._historyItems[item.id] = item; });
+
   listEl.innerHTML = items.map(item => {
     const date = new Date(item.created_at).toLocaleDateString('it-IT');
     const courseName = COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course;
@@ -1042,7 +1046,7 @@ async function loadHistory() {
           </div>
         </div>
         <div class="history-actions">
-          <button class="btn-sm" onclick='viewItem(${JSON.stringify(JSON.stringify(item))})'>Visualizza</button>
+          <button class="btn-sm" onclick="viewItem('${item.id}')">Visualizza</button>
           <button class="btn-sm danger" onclick="deleteItem('${item.id}')">Elimina</button>
         </div>
       </div>`;
@@ -1053,8 +1057,9 @@ async function loadHistory() {
   }
 }
 
-function viewItem(itemJson) {
-  const item = JSON.parse(itemJson);
+function viewItem(itemId) {
+  const item = (window._historyItems || {})[itemId];
+  if (!item) { showToast('Report non trovato.', 'error'); return; }
   const date = new Date(item.created_at).toLocaleDateString('it-IT');
   const courseName = COURSE_INFO[item.course]?.label || item.course;
 
