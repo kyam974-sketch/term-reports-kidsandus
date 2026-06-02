@@ -131,10 +131,11 @@
   /* ── PARENT TYPE ──────────────────────────────────────────────────────────── */
   .parent-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .parent-type-option { position: relative; }
-  .parent-type-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
-  .parent-type-option label { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 12px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .parent-type-option input[type="radio"],
+  .parent-type-option input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .parent-type-option label { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 500; color: var(--muted); }
   .parent-type-option input:checked + label { border-color: var(--accent); background: rgba(212,113,74,0.06); color: var(--accent); }
-  .parent-type-option label .emoji { font-size: 20px; line-height: 1; }
+  .parent-type-option label .emoji { font-size: 18px; line-height: 1; }
 
   /* ── REPORT TYPE TOGGLE ───────────────────────────────────────────────────── */
   .report-type-toggle { display: flex; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
@@ -335,7 +336,7 @@
           <button id="btn-finale" onclick="setReportType('finale')">Finale (con valutazione annuale)</button>
         </div>
       </div>
-      <div class="field-group">
+      <div class="field-group" id="oral-test-group">
         <label>Oral test</label>
         <input type="text" id="oral-test" placeholder="es. Superato con ottimi risultati / Non ancora svolto">
       </div>
@@ -344,34 +345,37 @@
     <div class="section-divider"><span>Tipologia genitore</span></div>
 
     <div class="field-group" style="margin-bottom:20px">
-      <label>Come è il genitore?</label>
-      <div class="parent-type-grid">
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-standard" value="standard" checked>
-          <label for="pt-standard"><span class="emoji">😊</span>Standard</label>
-        </div>
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-permaloso" value="permaloso">
-          <label for="pt-permaloso"><span class="emoji">😤</span>Permaloso / Suscettibile</label>
-        </div>
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-pignolo" value="pignolo">
-          <label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo / Esigente</label>
-        </div>
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-ansioso" value="ansioso">
-          <label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label>
-        </div>
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-entusiasta" value="entusiasta">
-          <label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label>
-        </div>
-        <div class="parent-type-option">
-          <input type="radio" name="parent-type" id="pt-distaccato" value="distaccato">
-          <label for="pt-distaccato"><span class="emoji">😶</span>Distaccato / Critico</label>
-        </div>
+      <label>Come è il genitore? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
+      <div class="parent-type-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-standard" value="standard" checked><label for="pt-standard"><span class="emoji">😊</span>Standard</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-permaloso" value="permaloso"><label for="pt-permaloso"><span class="emoji">😤</span>Permaloso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-pignolo" value="pignolo"><label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-ansioso" value="ansioso"><label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-entusiasta" value="entusiasta"><label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-distaccato" value="distaccato"><label for="pt-distaccato"><span class="emoji">😶</span>Distaccato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-logorroico" value="logorroico"><label for="pt-logorroico"><span class="emoji">💬</span>Logorroico</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-collaborativo" value="collaborativo"><label for="pt-collaborativo"><span class="emoji">🤝</span>Collaborativo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-negazionista" value="negazionista"><label for="pt-negazionista"><span class="emoji">🙈</span>Negazionista</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-perfetto" value="perfetto"><label for="pt-perfetto"><span class="emoji">👑</span>Il bimbo è perfetto</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-distratto" value="distratto"><label for="pt-distratto"><span class="emoji">📱</span>Distratto</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-reattivo" value="reattivo"><label for="pt-reattivo"><span class="emoji">⚡</span>Reattivo</label></div>
       </div>
-      <div class="field-hint" style="margin-top:8px">Questa informazione guida il tono del report ma non verrà mai citata nel testo finale.</div>
+      <div class="field-hint" style="margin-top:8px">Guida il tono del report — non compare mai nel testo finale.</div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Come è il bambino? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
+      <div class="parent-type-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-entusiasta" value="entusiasta"><label for="ct-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-crescita" value="crescita"><label for="ct-crescita"><span class="emoji">🦋</span>In crescita</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-vivace" value="vivace"><label for="ct-vivace"><span class="emoji">🌪️</span>Vivace</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-stanco" value="stanco"><label for="ct-stanco"><span class="emoji">😴</span>Stanco/discontinuo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-showman" value="showman"><label for="ct-showman"><span class="emoji">🎭</span>Showman</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-ansioso" value="ansioso"><label for="ct-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-selettivo" value="selettivo"><label for="ct-selettivo"><span class="emoji">🤐</span>Selettivo</label></div>
+      </div>
+      <div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
     </div>
 
     <div class="field-group" style="margin-bottom:20px">
@@ -541,6 +545,11 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+// ── Heartbeat: mantiene attivo il server Render ogni 10 minuti ───────────────
+setInterval(() => {
+  fetch('/api/ping').catch(() => {});
+}, 10 * 60 * 1000);
+
 // ════════════════════════════════════════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════════════════════════════════════════
@@ -652,6 +661,12 @@ function onCourseChange() {
   const selTrim  = document.getElementById('trimestre-select');
   const labelTrim = document.getElementById('trimestre-label');
 
+  // Hide oral test for babies
+  const oralGroup = document.getElementById('oral-test-group');
+  if (oralGroup) {
+    oralGroup.style.display = (course === 'mousy' || course === 'linda') ? 'none' : 'flex';
+  }
+
   // Update course info panel
   if (course && COURSE_INFO[course]) {
     panel.innerHTML = `<strong>${COURSE_INFO[course].label}</strong><br>${COURSE_INFO[course].desc}`;
@@ -737,12 +752,29 @@ const LOADING_MESSAGES = [
 ];
 
 const PARENT_GUIDANCE = {
-  standard:    'Tono professionale, caldo e rassicurante. Bilancia aspetti positivi e aree di miglioramento in modo diretto.',
-  permaloso:   'Tono molto diplomatico. Qualsiasi aspetto critico va inquadrato come opportunità di crescita, mai come problema. Sottolinea abbondantemente i progressi. Evita qualsiasi formulazione che possa sembrare una critica.',
-  pignolo:     'Tono preciso, dettagliato e professionale. Il genitore vuole informazioni concrete e specifiche. Usa esempi precisi. Spiega le strategie didattiche adottate. Sii puntuale e metodico.',
-  ansioso:     'Tono molto rassicurante. Ogni possibile preoccupazione va subito bilanciata da una rassicurazione. Sottolinea che tutto è sotto controllo e che le strategie sono già in atto.',
-  entusiasta:  'Tono caldo ed energico. Il genitore è motivato, puoi essere diretto anche sulle sfide, sapendo che le accoglierà positivamente.',
-  distaccato:  'Tono formale e molto professionale. Fatti concreti, progressi misurabili, strategie chiare. Meno calore, più sostanza e precisione.'
+  standard:      'Tono professionale, caldo e rassicurante. Bilancia aspetti positivi e aree di miglioramento in modo diretto.',
+  permaloso:     'Tono molto diplomatico. Qualsiasi aspetto critico va inquadrato come opportunità di crescita, mai come problema. Sottolinea abbondantemente i progressi. Evita qualsiasi formulazione che possa sembrare una critica.',
+  pignolo:       'Tono preciso, dettagliato e professionale. Il genitore vuole informazioni concrete e specifiche. Usa esempi precisi. Spiega le strategie didattiche adottate. Sii puntuale e metodico.',
+  ansioso:       'Tono molto rassicurante. Ogni possibile preoccupazione va subito bilanciata da una rassicurazione. Sottolinea che tutto è sotto controllo e che le strategie sono già in atto.',
+  entusiasta:    'Tono caldo ed energico. Il genitore è motivato, puoi essere diretto anche sulle sfide, sapendo che le accoglierà positivamente.',
+  distaccato:    'Tono formale e molto professionale. Fatti concreti, progressi misurabili, strategie chiare. Meno calore, più sostanza e precisione.',
+  logorroico:    'Il genitore vuole molti dettagli e tende a fare molte domande. Fornisci informazioni concrete e specifiche, anticipa le possibili domande, spiega bene le strategie adottate.',
+  collaborativo: 'Genitore che lavora attivamente con la scuola e recepisce bene i consigli. Puoi essere diretto e propositivo, suggerendo attività da fare a casa e strategie condivise.',
+  negazionista:  'Il genitore tende a non vedere le difficoltà del figlio. Usa esempi concreti e osservazioni fattuali. Incornicia tutto in modo positivo ma sii preciso e specifico per far passare il messaggio.',
+  perfetto:      'Il genitore non accetta critiche sul figlio e lo considera sempre perfetto. Ogni osservazione deve essere formulata in modo estremamente positivo. Mai usare parole come difficoltà, problema, migliorare.',
+  distratto:     'Il genitore è difficile da coinvolgere. Usa un linguaggio semplice e diretto, messaggi chiari e concreti. Evita tecnicismi.',
+  reattivo:      'Il genitore si agita facilmente alle notizie negative. Gestisci con molta diplomazia ogni aspetto critico. Bilancia sempre con almeno due aspetti positivi prima di qualsiasi osservazione.'
+};
+
+const CHILD_GUIDANCE = {
+  entusiasta:  'Il bambino/a è sempre molto motivato e partecipa con energia e entusiasmo. Valorizza questa caratteristica positiva nel report.',
+  timido:      'Il bambino/a è riservato e ha bisogno di tempo per sentirsi a proprio agio. Descrivi i suoi progressi con delicatezza, valorizzando ogni piccolo passo verso la partecipazione.',
+  crescita:    "Il bambino/a ha fatto un percorso significativo nel corso del periodo. Sottolinea l'evoluzione e i cambiamenti positivi osservati.",
+  vivace:      'Il bambino/a è molto energico e vivace, a volte difficile da gestire. Descrivi la sua energia in modo positivo, sottolineando come viene canalizzata nelle attività.',
+  stanco:      'Il bambino/a ha un rendimento variabile, spesso influenzato dalla stanchezza o da fattori esterni. Descrivi le sue potenzialità nei momenti di maggiore presenza.',
+  showman:     "Il bambino/a ama essere al centro dell'attenzione e si esibisce volentieri. Valorizza questa caratteristica come risorsa per l'apprendimento.",
+  ansioso:     'Il bambino/a ha bisogno di rassicurazioni e teme gli errori. Sottolinea un ambiente sicuro e i suoi successi. Usa un tono molto incoraggiante.',
+  selettivo:   "Il bambino/a comprende molto ma produce poco spontaneamente. Descrivi la sua comprensione come un punto di forza, menzionando le strategie per stimolare la produzione."
 };
 
 function debugLog(msg, type = 'info') {
@@ -771,7 +803,9 @@ async function generateReport() {
   const oralTest    = document.getElementById('oral-test').value.trim();
   const followups   = document.getElementById('followups').value.trim();
   const extraNotes  = document.getElementById('extra-notes').value.trim();
-  const parentType  = document.querySelector('input[name="parent-type"]:checked').value;
+  const parentTypes = Array.from(document.querySelectorAll('input[name="parent-type"]:checked')).map(el => el.value);
+  const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'standard';
+  const childTypes  = Array.from(document.querySelectorAll('input[name="child-type"]:checked')).map(el => el.value);
   const prevReport  = uploadedFileContent || document.getElementById('prev-report-text').value.trim();
 
   debugLog('Bottone premuto — controllo campi...', 'info');
@@ -830,12 +864,23 @@ ${courseInfo.desc}
 FOLLOW-UP LEZIONI:
 ${followups}
 
-ORAL TEST: ${oralTest || 'Non specificato'}
+${(course !== 'mousy' && course !== 'linda') ? 'ORAL TEST: ' + (oralTest || 'Non specificato') : '(Oral test non previsto per questo corso)'}
 
 NOTE INTERNE — non citarle nel report, usale solo per guidare tono e contenuto:
-- Tipo di genitore: ${parentType} → ${PARENT_GUIDANCE[parentType]}
+- Tipo di genitore: ${parentType}
+  Istruzioni per ogni caratteristica:
+  ${parentTypes.map(pt => '  • ' + pt + ': ' + (PARENT_GUIDANCE[pt] || '')).join('\n')}
+  Se ci sono più caratteristiche, bilancia le indicazioni in modo coerente.
+${childTypes.length > 0 ? '- Personalità bambino/a: ' + childTypes.join(', ') + '\n  ' + childTypes.map(ct => ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n  ') : ''}
+  \${childTypes.map(ct => '  • ' + ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n')}\` : ''}
 - Note aggiuntive: ${extraNotes || 'Nessuna'}
-
+${reportType === 'finale' ? `
+ISTRUZIONI SPECIALI PER REPORT FINALE:
+- Usa il PASSATO PROSSIMO per descrivere progressi (es. "ha dimostrato", "ha partecipato", "ha raggiunto").
+- Usa il presente solo per caratteristiche stabili della personalità.
+- Usa il futuro per i consigli estivi.
+- EVITA il presente per i progressi (NON "continua a migliorare" MA "ha migliorato").
+- Tono da documento conclusivo di fine anno, non da aggiornamento intermedio.` : ''}
 ${prevReport ? `REPORT PRECEDENTE — mantieni continuità ed evidenzia progressi o cambiamenti:
 ${prevReport.substring(0, 2000)}` : ''}
 
@@ -908,6 +953,7 @@ Genera il report con queste sezioni (testo fluido in italiano, NO bullet points)
       trimestre,
       gender,
       parent_type: parentType,
+      child_type: childTypes.join(', '),
       oral_test: oralTest,
       report_type: reportType,
       sections,
@@ -1205,7 +1251,9 @@ function resetForm() {
   document.getElementById('followups').value = '';
   document.getElementById('extra-notes').value = '';
   document.getElementById('prev-report-text').value = '';
-  document.querySelector('input[name="parent-type"][value="standard"]').checked = true;
+  document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
+  document.getElementById('pt-standard').checked = true;
+  document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
   clearUpload();
   document.getElementById('course-info-panel').classList.remove('visible');
   document.getElementById('results-area').style.display = 'none';
