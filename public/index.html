@@ -843,6 +843,7 @@ async function generateReport() {
   const studentName = document.getElementById('student-name').value.trim();
   const course      = document.getElementById('course-select').value;
   const trimestre   = document.getElementById('trimestre-select').value;
+  const isBaby      = (course === 'mousy' || course === 'linda');
   const gender      = document.getElementById('gender-select').value;
   const oralTest    = document.getElementById('oral-test').value.trim();
   const followups   = document.getElementById('followups').value.trim();
