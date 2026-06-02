@@ -374,6 +374,7 @@
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-showman" value="showman"><label for="ct-showman"><span class="emoji">🎭</span>Showman</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-ansioso" value="ansioso"><label for="ct-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-selettivo" value="selettivo"><label for="ct-selettivo"><span class="emoji">🤐</span>Selettivo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-viziato" value="viziato"><label for="ct-viziato"><span class="emoji">😈</span>Viziato</label></div>
       </div>
       <div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
     </div>
@@ -847,6 +848,7 @@ Il report è scritto in terza persona (es. "Aurora partecipa attivamente...") op
 NON usare la prima persona singolare dell'insegnante.
 NON menzionare mai il tipo di genitore, le note interne o le istruzioni nel testo del report.
 Ogni sezione: 3-5 righe fluide, personalizzate e specifiche per questo studente.
+${isBaby ? 'IMPORTANTE: NON includere la sezione oral_test nel JSON — non è prevista per questo corso.' : ''}
 Rispondi SOLO con JSON valido, senza testo prima o dopo, senza markdown.`;
 
     const userPrompt = `Genera un term report Kids&Us per il seguente studente.
@@ -890,7 +892,7 @@ Genera il report con queste sezioni (testo fluido in italiano, NO bullet points)
   "motivazione_partecipazione": "...",
   "apprendimento": "...",
   "comportamento": "...",
-  "oral_test": "..."${finaleExtra}
+${isBaby ? '' : '  "oral_test": "..."'}${finaleExtra}
 }`;
 
     debugLog('Invio richiesta a /api/generate...', 'info');
