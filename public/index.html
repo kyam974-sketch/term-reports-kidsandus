@@ -384,7 +384,7 @@
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-ansioso" value="ansioso"><label for="ct-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-showman" value="showman"><label for="ct-showman"><span class="emoji">🎭</span>Showman</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-selettivo" value="selettivo"><label for="ct-selettivo"><span class="emoji">🤐</span>Selettivo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-educato" value="educato"><label for="ct-educato"><span class="emoji">😇</span>Educato</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-vivace" value="vivace"><label for="ct-vivace"><span class="emoji">🌪️</span>Vivace</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-stanco" value="stanco"><label for="ct-stanco"><span class="emoji">😴</span>Stanco/discontinuo</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-svogliato" value="svogliato"><label for="ct-svogliato"><span class="emoji">🐌</span>Svogliato/lento</label></div>
@@ -818,7 +818,7 @@ const CHILD_GUIDANCE = {
   stanco:      'Il bambino/a ha un rendimento variabile, spesso influenzato dalla stanchezza o da fattori esterni. Descrivi le sue potenzialità nei momenti di maggiore presenza.',
   showman:     "Il bambino/a ama essere al centro dell'attenzione e si esibisce volentieri. Valorizza questa caratteristica come risorsa per l'apprendimento.",
   ansioso:     'Il bambino/a ha bisogno di rassicurazioni e teme gli errori. Sottolinea un ambiente sicuro e i suoi successi. Usa un tono molto incoraggiante.',
-  selettivo:   "Il bambino/a comprende molto ma produce poco spontaneamente. Descrivi la sua comprensione come un punto di forza, menzionando le strategie per stimolare la produzione."
+  educato:     'Il bambino/a è rispettoso, segue le regole del gruppo e ha un comportamento esemplare. Valorizza queste qualità nel report come base solida per un apprendimento sereno.',
 };
 
 function debugLog(msg, type = 'info') {
@@ -916,6 +916,11 @@ DATI STUDENTE:
 
 OBIETTIVI DEL CORSO:
 ${courseInfo.desc}
+
+PROGRESSIONE CORSI Kids&Us (usa questi nomi esatti se menzioni il corso successivo):
+Mousy → Linda → Sam → Emma → Oliver → Marcia → Pam & Paul → Ben & Brenda
+Il corso successivo a ${courseInfo.label.split('—')[0].trim()} è: ${{mousy:'Linda', linda:'Sam', sam:'Emma', emma:'Oliver', oliver:'Marcia', marcia:'Pam & Paul', pam_paul:'Ben & Brenda', ben_brenda:'un percorso più avanzato'}[course] || 'il corso successivo'}.
+Non inventare mai nomi di corsi diversi da quelli elencati sopra.
 
 FOLLOW-UP LEZIONI:
 ${followups}
