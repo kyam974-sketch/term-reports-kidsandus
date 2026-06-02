@@ -234,6 +234,18 @@
     .user-email { display: none; }
   }
 
+  /* Special needs chips */
+  .sn-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 20px;
+    background: var(--cream); border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    text-transform: none; letter-spacing: 0;
+  }
+  .sn-chip:has(input:checked) { border-color: var(--sage); background: var(--sage-light); color: var(--success); }
+  .sn-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+
   /* Student folder modal */
   .student-timeline { display: flex; flex-direction: column; gap: 12px; }
   .timeline-item { 
@@ -366,17 +378,48 @@
     <div class="field-group" style="margin-bottom:20px">
       <label>Come è il bambino? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
       <div class="parent-type-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-topstudent" value="topstudent"><label for="ct-topstudent"><span class="emoji">🏆</span>Top student</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-entusiasta" value="entusiasta"><label for="ct-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-crescita" value="crescita"><label for="ct-crescita"><span class="emoji">🦋</span>In crescita</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-ansioso" value="ansioso"><label for="ct-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-showman" value="showman"><label for="ct-showman"><span class="emoji">🎭</span>Showman</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-selettivo" value="selettivo"><label for="ct-selettivo"><span class="emoji">🤐</span>Selettivo</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-vivace" value="vivace"><label for="ct-vivace"><span class="emoji">🌪️</span>Vivace</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-stanco" value="stanco"><label for="ct-stanco"><span class="emoji">😴</span>Stanco/discontinuo</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-showman" value="showman"><label for="ct-showman"><span class="emoji">🎭</span>Showman</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-ansioso" value="ansioso"><label for="ct-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-selettivo" value="selettivo"><label for="ct-selettivo"><span class="emoji">🤐</span>Selettivo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-svogliato" value="svogliato"><label for="ct-svogliato"><span class="emoji">🐌</span>Svogliato/lento</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-viziato" value="viziato"><label for="ct-viziato"><span class="emoji">😈</span>Viziato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-maleducato" value="maleducato"><label for="ct-maleducato"><span class="emoji">😠</span>Maleducato</label></div>
       </div>
       <div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Special needs <span style="font-weight:300;text-transform:none;letter-spacing:0">(opzionale)</span></label>
+      <div style="display:flex; flex-direction:column; gap:12px; background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Tipologia:</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="ADHD"> ADHD</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="DSA"> DSA</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="spettro_autistico"> Spettro autistico</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="ritardo_linguistico"> Ritardo linguistico</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="difficolta_relazionali"> Difficoltà relazionali</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="altro_sn"> Altro:</label>
+            <input type="text" id="sn-altro" placeholder="specifica..." style="width:140px; padding:4px 10px; border-radius:20px; border:1.5px solid var(--border); font-size:12px; font-family:'DM Sans',sans-serif;">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Situazione:</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata"> ✅ Diagnosi confermata</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi"> 🔍 Mia ipotesi (non comunicata)</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata"> 🙈 Ignorata dai genitori</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione"> ❓ In attesa di valutazione</label>
+          </div>
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:6px">Guida l'AI nella gestione del tono — non compare mai nel testo del report.</div>
     </div>
 
     <div class="field-group" style="margin-bottom:20px">
@@ -807,6 +850,16 @@ async function generateReport() {
   const parentTypes = Array.from(document.querySelectorAll('input[name="parent-type"]:checked')).map(el => el.value);
   const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'standard';
   const childTypes  = Array.from(document.querySelectorAll('input[name="child-type"]:checked')).map(el => el.value);
+  const snTypes     = Array.from(document.querySelectorAll('input[name="sn-type"]:checked')).map(el => el.value);
+  const snAltro     = document.getElementById('sn-altro').value.trim();
+  const snStatus    = document.querySelector('input[name="sn-status"]:checked')?.value || '';
+  const snStatusMap = {
+    diagnosticata:   'Diagnosi confermata — i genitori sono consapevoli e collaborano',
+    ipotesi:         "Ipotesi dell'insegnante non ancora comunicata ai genitori — gestisci con estrema delicatezza, senza mai suggerire diagnosi nel testo",
+    ignorata:        'I genitori sono stati informati ma minimizzano o ignorano — usa un tono fermo ma diplomatico, con osservazioni fattuali concrete',
+    in_valutazione:  'Segnalato e in attesa di valutazione specialistica — tono di supporto e collaborazione'
+  };
+  const hasSN = snTypes.length > 0 || snAltro;
   const prevReport  = uploadedFileContent || document.getElementById('prev-report-text').value.trim();
 
   debugLog('Bottone premuto — controllo campi...', 'info');
@@ -873,7 +926,8 @@ NOTE INTERNE — non citarle nel report, usale solo per guidare tono e contenuto
   Istruzioni per ogni caratteristica:
   ${parentTypes.map(pt => '  • ' + pt + ': ' + (PARENT_GUIDANCE[pt] || '')).join('\n')}
   Se ci sono più caratteristiche, bilancia le indicazioni in modo coerente.
-${childTypes.length > 0 ? '- Personalità bambino/a: ' + childTypes.join(', ') + '\n  ' + childTypes.map(ct => ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n  ') : ''}
+${childTypes.length > 0 ? '- Personalità bambino/a: ' + childTypes.join(', ') + '\n  ' + childTypes.map(ct => '  • ' + ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n') : ''}
+${hasSN ? '- AREA DI ATTENZIONE (non citare mai nel testo, usa solo per modulare il tono):\n  Tipologia: ' + [...snTypes, snAltro].filter(Boolean).join(', ') + '\n  Situazione: ' + (snStatusMap[snStatus] || snStatus) + '\n  Adatta il linguaggio con professionalità e delicatezza. Non fare mai riferimento a diagnosi o difficoltà specifiche nel testo del report.' : ''}
   \${childTypes.map(ct => '  • ' + ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n')}\` : ''}
 - Note aggiuntive: ${extraNotes || 'Nessuna'}
 ${reportType === 'finale' ? `
@@ -956,6 +1010,7 @@ ${isBaby ? '' : '  "oral_test": "..."'}${finaleExtra}
       gender,
       parent_type: parentType,
       child_type: childTypes.join(', '),
+      special_needs: hasSN ? [...snTypes, snAltro].filter(Boolean).join(', ') + (snStatus ? ' (' + snStatus + ')' : '') : '',
       oral_test: oralTest,
       report_type: reportType,
       sections,
