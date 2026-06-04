@@ -437,21 +437,34 @@
 19/01 - Ottima lezione, ha partecipato attivamente alle canzoni e ha anticipato i comandi..."></textarea>
     </div>
 
-    <div class="section-divider"><span>Report precedenti (opzionale)</span></div>
+    <div class="section-divider"><span>Materiali di riferimento (tutti facoltativi)</span></div>
 
-    <div class="field-group" style="margin-bottom:28px">
-      <label>Carica report precedente per garantire continuità</label>
-      <div class="upload-zone">
-        <input type="file" id="prev-report-file" accept=".txt,.pdf,.docx" onchange="handleFileUpload(this)">
+    <!-- Report precedente singolo -->
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Report precedente <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF — per garantire continuità)</span></label>
+      <div class="upload-zone" onclick="document.getElementById('prev-reports-input').click()">
         <div class="upload-icon">📄</div>
-        <div class="upload-text"><strong>Clicca o trascina</strong> il report precedente</div>
-        <div class="upload-text" style="margin-top:4px;font-size:12px">Oppure incolla il testo nel campo sottostante</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare il report precedente</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">PDF o TXT</div>
       </div>
-      <div class="uploaded-file" id="uploaded-file-info" style="display:none;margin-top:10px">
-        <span>✓</span><span id="uploaded-file-name"></span>
-        <button onclick="clearUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      <input type="file" id="prev-reports-input" accept=".txt,.pdf" style="display:none" onchange="handlePrevReports(this)">
+      <div id="prev-reports-list" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;"></div>
+      <textarea id="prev-report-text" style="margin-top:10px;min-height:60px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
+    </div>
+
+    <!-- Screenshot report aziendale -->
+    <div class="field-group" style="margin-bottom:28px">
+      <label>Screenshot report aziendale <span style="font-weight:300;text-transform:none;letter-spacing:0">(opzionale — per migliorare il contenuto mantenendo il nostro stile)</span></label>
+      <div class="upload-zone" id="company-report-zone" onclick="document.getElementById('company-report-input').click()">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare lo screenshot del report aziendale</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">JPG, PNG — screenshot da smartreports.kidsandus.com</div>
       </div>
-      <textarea id="prev-report-text" style="margin-top:10px;min-height:80px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
+      <input type="file" id="company-report-input" accept="image/*" style="display:none" onchange="handleCompanyReport(this)">
+      <div class="uploaded-file" id="company-report-info" style="display:none;margin-top:10px">
+        <span>✓</span><span id="company-report-name"></span>
+        <button onclick="clearCompanyReport()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      </div>
     </div>
 
     <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
@@ -763,24 +776,68 @@ function setReportType(type) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// UPLOAD FILE
+// UPLOAD FILES
 // ════════════════════════════════════════════════════════════════════════════
-let uploadedFileContent = '';
+let prevReportsData = []; // [{name, text}, ...]
+let companyReportBase64 = null;
+let companyReportMime = null;
 
-function handleFileUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('uploaded-file-name').textContent = file.name;
-  document.getElementById('uploaded-file-info').style.display = 'flex';
-  const reader = new FileReader();
-  reader.onload = e => { uploadedFileContent = e.target.result; };
-  reader.readAsText(file);
+// ── Report precedenti multipli ───────────────────────────────────────────────
+function handlePrevReports(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      prevReportsData.push({ name: file.name, text: e.target.result });
+      renderPrevReportsList();
+    };
+    reader.readAsText(file);
+  });
+  input.value = '';
 }
 
+function renderPrevReportsList() {
+  const list = document.getElementById('prev-reports-list');
+  list.innerHTML = prevReportsData.map((r, i) => `
+    <div class="uploaded-file">
+      <span>✓</span><span style="flex:1">${escHtml(r.name)}</span>
+      <button onclick="removePrevReport(${i})" style="background:none;border:none;cursor:pointer;color:var(--success);font-size:16px;">✕</button>
+    </div>`).join('');
+}
+
+function removePrevReport(idx) {
+  prevReportsData.splice(idx, 1);
+  renderPrevReportsList();
+}
+
+// ── Screenshot report aziendale ──────────────────────────────────────────────
+function handleCompanyReport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    companyReportBase64 = dataUrl.split(',')[1];
+    companyReportMime = file.type;
+    document.getElementById('company-report-name').textContent = file.name;
+    document.getElementById('company-report-info').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCompanyReport() {
+  companyReportBase64 = null;
+  companyReportMime = null;
+  document.getElementById('company-report-info').style.display = 'none';
+  document.getElementById('company-report-input').value = '';
+}
+
+// Legacy - kept for compatibility
 function clearUpload() {
-  uploadedFileContent = '';
-  document.getElementById('uploaded-file-info').style.display = 'none';
-  document.getElementById('prev-report-file').value = '';
+  prevReportsData = [];
+  renderPrevReportsList();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -861,7 +918,8 @@ async function generateReport() {
     in_valutazione:  'Segnalato e in attesa di valutazione specialistica — tono di supporto e collaborazione'
   };
   const hasSN = snTypes.length > 0 || snAltro;
-  const prevReport  = uploadedFileContent || document.getElementById('prev-report-text').value.trim();
+  const prevReportText = document.getElementById('prev-report-text').value.trim();
+  const allPrevReports = [...prevReportsData.map(r => r.text), prevReportText].filter(Boolean);
 
   debugLog('Bottone premuto — controllo campi...', 'info');
 
