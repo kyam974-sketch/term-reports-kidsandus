@@ -437,11 +437,11 @@
 19/01 - Ottima lezione, ha partecipato attivamente alle canzoni e ha anticipato i comandi..."></textarea>
     </div>
 
-    <div class="section-divider"><span>Materiali di riferimento (tutti facoltativi)</span></div>
+    <div class="section-divider"><span>Documenti di riferimento (facoltativi)</span></div>
 
     <!-- Report precedente singolo -->
     <div class="field-group" style="margin-bottom:20px">
-      <label>Report precedente <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF — per garantire continuità)</span></label>
+      <label>📄 Report precedente <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF del trimestre scorso)</span></label>
       <div class="upload-zone" onclick="document.getElementById('prev-reports-input').click()">
         <div class="upload-icon">📄</div>
         <div class="upload-text"><strong>Clicca</strong> per caricare il report precedente</div>
@@ -454,7 +454,7 @@
 
     <!-- Screenshot report aziendale -->
     <div class="field-group" style="margin-bottom:28px">
-      <label>Screenshot report aziendale <span style="font-weight:300;text-transform:none;letter-spacing:0">(opzionale — per migliorare il contenuto mantenendo il nostro stile)</span></label>
+      <label>🖼️ Screenshot report aziendale <span style="font-weight:300;text-transform:none;letter-spacing:0">(da smartreports.kidsandus.com)</span></label>
       <div class="upload-zone" id="company-report-zone" onclick="document.getElementById('company-report-input').click()">
         <div class="upload-icon">🖼️</div>
         <div class="upload-text"><strong>Clicca</strong> per caricare lo screenshot del report aziendale</div>
@@ -464,6 +464,21 @@
       <div class="uploaded-file" id="company-report-info" style="display:none;margin-top:10px">
         <span>✓</span><span id="company-report-name"></span>
         <button onclick="clearCompanyReport()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      </div>
+    </div>
+
+    <!-- Verbale colloquio -->
+    <div class="field-group" style="margin-bottom:28px">
+      <label>📋 Verbale colloquio <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF — note del tutoring con i genitori)</span></label>
+      <div class="upload-zone" onclick="document.getElementById('tutoring-input').click()">
+        <div class="upload-icon">📋</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare il verbale del colloquio</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">PDF — aiuta a capire le preoccupazioni e gli accordi presi con i genitori</div>
+      </div>
+      <input type="file" id="tutoring-input" accept=".txt,.pdf" style="display:none" onchange="handleTutoringReport(this)">
+      <div class="uploaded-file" id="tutoring-info" style="display:none;margin-top:10px">
+        <span>✓</span><span id="tutoring-name"></span>
+        <button onclick="clearTutoring()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
       </div>
     </div>
 
@@ -834,6 +849,27 @@ function clearCompanyReport() {
   document.getElementById('company-report-input').value = '';
 }
 
+// ── Verbale colloquio ────────────────────────────────────────────────────────
+let tutoringText = '';
+
+function handleTutoringReport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    tutoringText = e.target.result;
+    document.getElementById('tutoring-name').textContent = file.name;
+    document.getElementById('tutoring-info').style.display = 'flex';
+  };
+  reader.readAsText(file);
+}
+
+function clearTutoring() {
+  tutoringText = '';
+  document.getElementById('tutoring-info').style.display = 'none';
+  document.getElementById('tutoring-input').value = '';
+}
+
 // Legacy - kept for compatibility
 function clearUpload() {
   prevReportsData = [];
@@ -1001,8 +1037,8 @@ ISTRUZIONI SPECIALI PER REPORT FINALE:
 - Usa il futuro per i consigli estivi.
 - EVITA il presente per i progressi (NON "continua a migliorare" MA "ha migliorato").
 - Tono da documento conclusivo di fine anno, non da aggiornamento intermedio.` : ''}
-${prevReport ? `REPORT PRECEDENTE — mantieni continuità ed evidenzia progressi o cambiamenti:
-${prevReport.substring(0, 2000)}` : ''}
+${allPrevReports.length > 0 ? 'REPORT PRECEDENTE — mantieni continuita ed evidenzia progressi o cambiamenti:\n' + allPrevReports[0].substring(0, 2000) : ''}
+${tutoringText ? 'VERBALE COLLOQUIO CON I GENITORI — non citare mai nel report che esiste un verbale, usalo solo per modulare tono e contenuti:\n' + tutoringText.substring(0, 1500) : ''}
 
 Genera il report con queste sezioni (testo fluido in italiano, NO bullet points):
 
