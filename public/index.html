@@ -1406,6 +1406,14 @@ function escHtml(str) {
 }
 
 function resetForm() {
+  // Se c'è un report generato e non salvato, chiedi conferma
+  if (document.getElementById('results-area').style.display !== 'none' && currentReport) {
+    const studentName = currentReport.student_name || 'questo studente';
+    if (!confirm('Hai generato un report per ' + studentName + ' ma non lo hai ancora salvato nello storico.\n\nVuoi continuare senza salvare?')) {
+      return;
+    }
+  }
+
   document.getElementById('student-name').value = '';
   document.getElementById('course-select').value = '';
   document.getElementById('oral-test').value = '';
