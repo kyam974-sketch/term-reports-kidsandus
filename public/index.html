@@ -884,6 +884,7 @@ function clearUpload() {
 // GENERA REPORT
 // ════════════════════════════════════════════════════════════════════════════
 let currentReport = null;
+let reportSaved = false;
 
 const LOADING_MESSAGES = [
   'Analisi dei follow-up in corso...',
@@ -962,6 +963,7 @@ async function generateReport() {
   const allPrevReports = [...prevReportsData.map(r => r.text), prevReportText].filter(Boolean);
 
   debugLog('Bottone premuto — controllo campi...', 'info');
+  reportSaved = false;
 
   if (!studentName || !course || !followups) {
     const missing = [];
@@ -1228,6 +1230,7 @@ async function saveToSupabase() {
       showToast('Errore: ' + (result.error || 'Riprova'), 'error');
     } else {
       debugLog('Salvato con successo!', 'ok');
+    reportSaved = true;
       btn.innerHTML = '<span>✓</span> Salvato!';
       btn.style.background = 'var(--success)';
       showToast('Report salvato nello storico!', 'success');
@@ -1407,7 +1410,7 @@ function escHtml(str) {
 
 function resetForm() {
   // Se c'è un report generato e non salvato, chiedi conferma
-  if (document.getElementById('results-area').style.display !== 'none' && currentReport) {
+  if (document.getElementById('results-area').style.display !== 'none' && currentReport && !reportSaved) {
     const studentName = currentReport.student_name || 'questo studente';
     if (!confirm('Hai generato un report per ' + studentName + ' ma non lo hai ancora salvato nello storico.\n\nVuoi continuare senza salvare?')) {
       return;
