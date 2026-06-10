@@ -359,7 +359,7 @@
     <div class="field-group" style="margin-bottom:20px">
       <label>Come è il genitore? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
       <div class="parent-type-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-standard" value="standard"><label for="pt-standard"><span class="emoji">😊</span>Standard</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-sereno" value="sereno"><label for="pt-sereno"><span class="emoji">😊</span>Sereno</label></div>
         <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-permaloso" value="permaloso"><label for="pt-permaloso"><span class="emoji">😤</span>Permaloso</label></div>
         <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-pignolo" value="pignolo"><label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo</label></div>
         <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-ansioso" value="ansioso"><label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
@@ -894,7 +894,7 @@ const LOADING_MESSAGES = [
 ];
 
 const PARENT_GUIDANCE = {
-  standard:      'Tono professionale, caldo e rassicurante. Bilancia aspetti positivi e aree di miglioramento in modo diretto.',
+  sereno:        'Genitore equilibrato che ascolta con fiducia e serenità. Recepisce le informazioni senza ansie né pretese. Tono professionale e diretto, bilancia aspetti positivi e aree di miglioramento naturalmente.',
   permaloso:     'Tono molto diplomatico. Qualsiasi aspetto critico va inquadrato come opportunità di crescita, mai come problema. Sottolinea abbondantemente i progressi. Evita qualsiasi formulazione che possa sembrare una critica.',
   pignolo:       'Tono preciso, dettagliato e professionale. Il genitore vuole informazioni concrete e specifiche. Usa esempi precisi. Spiega le strategie didattiche adottate. Sii puntuale e metodico.',
   ansioso:       'Tono molto rassicurante. Ogni possibile preoccupazione va subito bilanciata da una rassicurazione. Sottolinea che tutto è sotto controllo e che le strategie sono già in atto.',
@@ -947,7 +947,7 @@ async function generateReport() {
   const followups   = document.getElementById('followups').value.trim();
   const extraNotes  = document.getElementById('extra-notes').value.trim();
   const parentTypes = Array.from(document.querySelectorAll('input[name="parent-type"]:checked')).map(el => el.value);
-  const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'standard';
+  const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'sereno';
   const childTypes  = Array.from(document.querySelectorAll('input[name="child-type"]:checked')).map(el => el.value);
   const snTypes     = Array.from(document.querySelectorAll('input[name="sn-type"]:checked')).map(el => el.value);
   const snAltro     = document.getElementById('sn-altro').value.trim();
@@ -1424,7 +1424,7 @@ function resetForm() {
   document.getElementById('extra-notes').value = '';
   document.getElementById('prev-report-text').value = '';
   document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
-  document.getElementById('pt-standard').checked = true;
+  // nessuna selezione di default per il genitore
   document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
   clearUpload();
   document.getElementById('course-info-panel').classList.remove('visible');
