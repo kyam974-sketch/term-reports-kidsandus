@@ -377,25 +377,25 @@
 
     <div class="field-group" style="margin-bottom:20px">
       <label>Come è il bambino? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
-      <div class="parent-type-grid" style="grid-template-columns:repeat(4,1fr)">
+            <div class="parent-type-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-topstudent" value="topstudent"><label for="ct-topstudent"><span class="emoji">🏆</span>Top student</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-smart" value="smart"><label for="ct-smart"><span class="emoji">🧠</span>Smart</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-entusiasta" value="entusiasta"><label for="ct-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-crescita" value="crescita"><label for="ct-crescita"><span class="emoji">🦋</span>In crescita</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-affettuoso" value="affettuoso"><label for="ct-affettuoso"><span class="emoji">🥰</span>Affettuoso</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-istrionico" value="istrionico"><label for="ct-istrionico"><span class="emoji">🎭</span>Istrionico</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-pagliaccio" value="pagliaccio"><label for="ct-pagliaccio"><span class="emoji">🤡</span>Fa il pagliaccio</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-intelligente" value="intelligente"><label for="ct-intelligente"><span class="emoji">🧠</span>Intelligente</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-educato" value="educato"><label for="ct-educato"><span class="emoji">😇</span>Educato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-vivace" value="vivace"><label for="ct-vivace"><span class="emoji">🌪️</span>Vivace</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-mammone" value="mammone"><label for="ct-mammone"><span class="emoji">👶</span>Mammone</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-stanco" value="stanco"><label for="ct-stanco"><span class="emoji">😴</span>Stanco/discontinuo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-esibizionista" value="esibizionista"><label for="ct-esibizionista"><span class="emoji">🎪</span>Esibizionista</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-chiacchierone" value="chiacchierone"><label for="ct-chiacchierone"><span class="emoji">💬</span>Chiacchierone</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-svogliato" value="svogliato"><label for="ct-svogliato"><span class="emoji">🐌</span>Svogliato/lento</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-viziato" value="viziato"><label for="ct-viziato"><span class="emoji">😈</span>Viziato</label></div>
         <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-maleducato" value="maleducato"><label for="ct-maleducato"><span class="emoji">😠</span>Maleducato</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-mammone" value="mammone"><label for="ct-mammone"><span class="emoji">👶</span>Mammone</label></div>
-        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-logorroico" value="logorroico"><label for="ct-logorroico"><span class="emoji">💬</span>Logorroico</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-permaloso" value="permaloso"><label for="ct-permaloso"><span class="emoji">😤</span>Permaloso</label></div>
       </div>
-      <div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
+      <div class="field-hint"<div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
     </div>
 
     <div class="field-group" style="margin-bottom:20px">
@@ -909,14 +909,22 @@ const PARENT_GUIDANCE = {
 };
 
 const CHILD_GUIDANCE = {
-  entusiasta:  'Il bambino/a è sempre molto motivato e partecipa con energia e entusiasmo. Valorizza questa caratteristica positiva nel report.',
-  timido:      'Il bambino/a è riservato e ha bisogno di tempo per sentirsi a proprio agio. Descrivi i suoi progressi con delicatezza, valorizzando ogni piccolo passo verso la partecipazione.',
-  crescita:    "Il bambino/a ha fatto un percorso significativo nel corso del periodo. Sottolinea l'evoluzione e i cambiamenti positivi osservati.",
-  vivace:      'Il bambino/a è molto energico e vivace, a volte difficile da gestire. Descrivi la sua energia in modo positivo, sottolineando come viene canalizzata nelle attività.',
-  stanco:      'Il bambino/a ha un rendimento variabile, spesso influenzato dalla stanchezza o da fattori esterni. Descrivi le sue potenzialità nei momenti di maggiore presenza.',
-  showman:     "Il bambino/a ama essere al centro dell'attenzione e si esibisce volentieri. Valorizza questa caratteristica come risorsa per l'apprendimento.",
-  affettuoso:  'Il bambino/a è molto affettuoso e cerca spesso il contatto con l\'insegnante. Valorizza questa caratteristica come segno di fiducia e benessere in classe.',
-  educato:     'Il bambino/a è rispettoso, segue le regole del gruppo e ha un comportamento esemplare. Valorizza queste qualità nel report come base solida per un apprendimento sereno.',
+  topstudent:    'Eccellente sotto ogni aspetto: apprende rapidamente, si comporta in modo esemplare, rispetta le regole, è autonomo, gestisce i materiali con cura. Il bambino ideale sotto tutti i punti di vista.',
+  smart:         'Coglie rapidamente gli stimoli, assimila con facilità e risponde prontamente alle proposte didattiche. IMPORTANTE: NON usare mai le parole intelligente o intelligenza — usa espressioni come coglie rapidamente, assimila con facilità, risponde prontamente. Riguarda SOLO le capacità di apprendimento, non il comportamento. Non fare confronti col gruppo. Non confondere con Top student.',
+  entusiasta:    'Il bambino/a è sempre molto motivato e partecipa con energia e entusiasmo. Valorizza questa caratteristica positiva nel report.',
+  crescita:      "Il bambino/a ha fatto un percorso significativo nel corso del periodo. Sottolinea l'evoluzione e i cambiamenti positivi osservati rispetto all'inizio.",
+  affettuoso:    "Il bambino/a è molto affettuoso e cerca spesso il contatto con l'insegnante. Valorizza questa caratteristica come segno di fiducia e benessere in classe.",
+  educato:       'Il bambino/a è rispettoso, segue le regole del gruppo e ha un comportamento esemplare. Valorizza queste qualità come base solida per un apprendimento sereno.',
+  timido:        'Il bambino/a è riservato e ha bisogno di tempo per sentirsi a proprio agio. Descrivi i suoi progressi con delicatezza, valorizzando ogni piccolo passo verso la partecipazione.',
+  vivace:        'Il bambino/a è molto energico e vivace, a volte difficile da gestire. Descrivi la sua energia in modo positivo, sottolineando come viene canalizzata nelle attività.',
+  mammone:       "Il bambino/a fatica a separarsi dal genitore, ha bisogno di rassicurazioni continue e stenta a vivere la lezione in autonomia. Descrivi il percorso di distacco come un processo naturale, valorizzando ogni piccolo passo verso l'indipendenza.",
+  stanco:        'Il bambino/a ha un rendimento variabile, spesso influenzato dalla stanchezza o da fattori esterni. Descrivi le sue potenzialità nei momenti di maggiore presenza.',
+  esibizionista: "Il bambino/a cerca continuamente l'attenzione del gruppo, si mette in mostra e tende a fare il protagonista anche quando non è il momento. Descrivi diplomaticamente la necessità di canalizzare questa energia in modo più costruttivo.",
+  chiacchierone: 'Il bambino/a parla moltissimo, spesso fuori turno o fuori contesto, disturbando il ritmo della lezione. Descrivi diplomaticamente la necessità di imparare ad ascoltare e rispettare i tempi del gruppo.',
+  svogliato:     'Il bambino/a mostra scarsa motivazione e, nonostante la ripetizione costante dei contenuti, fatica ad interiorizzarli. Descrivi diplomaticamente la necessità di maggiore stimolo, senza mai usare termini negativi. Valorizza i rari momenti di partecipazione.',
+  viziato:       'Il bambino/a è abituato a ottenere sempre quello che vuole e può essere impaziente o frustrabile. Descrivi le strategie di gestione diplomaticamente, senza mai usare la parola viziato. Valorizza i momenti in cui ha rispettato le regole.',
+  maleducato:    'Il bambino/a presenta comportamenti irrispettosi. Descrivi le strategie adottate con tatto, inquadrando i comportamenti problematici come aree di crescita. Non usare mai termini come maleducato o irrispettoso.',
+  permaloso:     'Il bambino/a si offende facilmente e reagisce in modo sproporzionato a osservazioni neutre, tendendo a chiudersi o a rifiutare la partecipazione. Descrivi con delicatezza estrema, evitando qualsiasi osservazione che possa essere percepita come critica.'
 };
 
 function debugLog(msg, type = 'info') {
