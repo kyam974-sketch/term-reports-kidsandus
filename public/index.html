@@ -416,10 +416,10 @@
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Situazione:</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata"> ✅ Diagnosi confermata</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi"> 🔍 Mia ipotesi (non comunicata)</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata"> 🙈 Ignorata dai genitori</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione"> ❓ In attesa di valutazione</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata" autocomplete="off"> ✅ Diagnosi confermata</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi" autocomplete="off"> 🔍 Mia ipotesi (non comunicata)</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata" autocomplete="off"> 🙈 Ignorata dai genitori</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione" autocomplete="off"> ❓ In attesa di valutazione</label>
           </div>
         </div>
       </div>
@@ -679,6 +679,17 @@ function onLogin(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-email-display').textContent = user.email;
+  // Reset forzato all'avvio per evitare che Safari ripristini valori precedenti
+  clearAllFormFields();
+}
+
+function clearAllFormFields() {
+  document.querySelectorAll('input[name="sn-status"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="sn-type"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
+  const snAltro = document.getElementById('sn-altro');
+  if (snAltro) snAltro.value = '';
 }
 
 function onLogout() {
