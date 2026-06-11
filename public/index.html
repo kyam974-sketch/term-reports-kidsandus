@@ -1435,6 +1435,16 @@ function resetForm() {
   // nessuna selezione di default per il genitore
   document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
   clearUpload();
+  // Reset documenti di riferimento
+  prevReportsData = [];
+  renderPrevReportsList();
+  document.getElementById('prev-reports-input').value = '';
+  clearCompanyReport();
+  clearTutoring();
+  // Reset special needs
+  document.querySelectorAll('input[name="sn-type"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="sn-status"]').forEach(el => el.checked = false);
+  document.getElementById('sn-altro').value = '';
   document.getElementById('course-info-panel').classList.remove('visible');
   document.getElementById('results-area').style.display = 'none';
   document.getElementById('debug-panel').style.display = 'none';
@@ -1443,6 +1453,8 @@ function resetForm() {
   const sel = document.getElementById('trimestre-select');
   sel.innerHTML = '<option value="T1">Term 1</option><option value="T2">Term 2</option><option value="T3">Term 3 (finale)</option>';
   setReportType('trimestrale');
+  currentReport = null;
+  reportSaved = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   showToast('Form azzerato — pronto per un nuovo studente!', 'success');
 }
