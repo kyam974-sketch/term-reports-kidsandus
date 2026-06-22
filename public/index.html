@@ -1467,7 +1467,7 @@ function resetForm() {
   document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
   // nessuna selezione di default per il genitore
   document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
-  clearUpload();
+  clearAllFormFields();
   document.getElementById('course-info-panel').classList.remove('visible');
   document.getElementById('results-area').style.display = 'none';
   document.getElementById('debug-panel').style.display = 'none';
