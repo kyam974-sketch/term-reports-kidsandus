@@ -354,6 +354,20 @@
       </div>
     </div>
 
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Tipo di lezione</label>
+        <div class="report-type-toggle">
+          <button class="active" id="btn-standard-lesson" onclick="setLessonType('standard')">Standard</button>
+          <button id="btn-nursery-lesson" onclick="setLessonType('nursery')">🏫 Nursery / Asilo nido</button>
+        </div>
+        <div id="nursery-info" style="display:none; margin-top:8px; background:rgba(122,158,135,0.08); border:1px solid rgba(122,158,135,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--success); line-height:1.6;">
+          Lezione da 30 min · Fino a 8 bambini · Nessun genitore · Attività semplificate
+        </div>
+      </div>
+      <div class="field-group"></div>
+    </div>
+
     <div class="section-divider"><span>Tipologia genitore</span></div>
 
     <div class="field-group" style="margin-bottom:20px">
@@ -416,10 +430,10 @@
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Situazione:</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata" autocomplete="off"> ✅ Diagnosi confermata</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi" autocomplete="off"> 🔍 Mia ipotesi (non comunicata)</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata" autocomplete="off"> 🙈 Ignorata dai genitori</label>
-            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione" autocomplete="off"> ❓ In attesa di valutazione</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata"> ✅ Diagnosi confermata</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi"> 🔍 Mia ipotesi (non comunicata)</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata"> 🙈 Ignorata dai genitori</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione"> ❓ In attesa di valutazione</label>
           </div>
         </div>
       </div>
@@ -679,17 +693,6 @@ function onLogin(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-email-display').textContent = user.email;
-  // Reset forzato all'avvio per evitare che Safari ripristini valori precedenti
-  clearAllFormFields();
-}
-
-function clearAllFormFields() {
-  document.querySelectorAll('input[name="sn-status"]').forEach(el => el.checked = false);
-  document.querySelectorAll('input[name="sn-type"]').forEach(el => el.checked = false);
-  document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
-  document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
-  const snAltro = document.getElementById('sn-altro');
-  if (snAltro) snAltro.value = '';
 }
 
 function onLogout() {
@@ -798,11 +801,23 @@ function updateReportTypeFromTerm() {
 // TIPO REPORT
 // ════════════════════════════════════════════════════════════════════════════
 let reportType = 'trimestrale';
+let lessonType = 'standard';
 
 function setReportType(type) {
   reportType = type;
   document.getElementById('btn-trimestrale').classList.toggle('active', type === 'trimestrale');
   document.getElementById('btn-finale').classList.toggle('active', type === 'finale');
+}
+
+function setLessonType(type) {
+  lessonType = type;
+  document.getElementById('btn-standard-lesson').classList.toggle('active', type === 'standard');
+  document.getElementById('btn-nursery-lesson').classList.toggle('active', type === 'nursery');
+  document.getElementById('nursery-info').style.display = type === 'nursery' ? 'block' : 'none';
+  // Se nursery, imposta automaticamente scuola esterna come contesto
+  if (type === 'nursery') {
+    document.getElementById('contesto-select').value = 'scuola_esterna';
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -968,6 +983,7 @@ async function generateReport() {
   const parentTypes = Array.from(document.querySelectorAll('input[name="parent-type"]:checked')).map(el => el.value);
   const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'sereno';
   const childTypes  = Array.from(document.querySelectorAll('input[name="child-type"]:checked')).map(el => el.value);
+  const isNursery   = lessonType === 'nursery';
   const snTypes     = Array.from(document.querySelectorAll('input[name="sn-type"]:checked')).map(el => el.value);
   const snAltro     = document.getElementById('sn-altro').value.trim();
   const snStatus    = document.querySelector('input[name="sn-status"]:checked')?.value || '';
@@ -1022,14 +1038,6 @@ NON usare la prima persona singolare dell'insegnante.
 NON menzionare mai il tipo di genitore, le note interne o le istruzioni nel testo del report.
 Ogni sezione: 3-5 righe fluide, personalizzate e specifiche per questo studente.
 ${isBaby ? 'IMPORTANTE: NON includere la sezione oral_test nel JSON — non è prevista per questo corso.' : ''}
-
-REGOLE FONDAMENTALI PER IL BILANCIAMENTO DEL REPORT:
-1. Le caratteristiche NEGATIVE del bambino (maleducato, svogliato, esibizionista, chiacchierone, viziato, permaloso, pagliaccio) NON devono sparire — devono emergere in forma diplomatica come "aree di crescita" o "aspetti su cui stiamo lavorando".
-2. Quando il genitore e "Il bimbo e perfetto" o "Permaloso", il tono deve essere ultra-calibrato MA le osservazioni problematiche devono comunque essere presenti — mai ignorate.
-3. NON usare frasi genericamente positive come "risorsa preziosa per il gruppo" per un bambino con caratteristiche negative predominanti.
-4. Con piu caratteristiche genitore, dai PRIORITA alle piu difficili (permaloso, il bimbo e perfetto, pretenzioso) — non fare una media al ribasso.
-5. Il report deve riflettere il profilo REALE e COMPLETO del bambino — non solo gli aspetti positivi.
-6. La "verita morbida" e il principio guida: ogni osservazione difficile deve esserci, concreta, ma formulata in modo che il genitore non possa attaccarsi.
 Rispondi SOLO con JSON valido, senza testo prima o dopo, senza markdown.`;
 
     const userPrompt = `Genera un term report Kids&Us per il seguente studente.
@@ -1053,6 +1061,12 @@ FOLLOW-UP LEZIONI:
 ${followups}
 
 ${(course !== 'mousy' && course !== 'linda') ? 'ORAL TEST: ' + (oralTest || 'Non specificato') : '(Oral test non previsto per questo corso)'}
+${isNursery ? 'CONTESTO NURSERY/ASILO NIDO:\n- Lezione da 30 minuti invece dei normali 45\n- Fino a 8 bambini invece dei normali 5\n- Nessun genitore presente in classe\n- Attivita semplificate e condensate\nNon fare riferimento ai genitori durante la lezione nel report.' : ''}
+CONTESTO NURSERY/ASILO NIDO:
+- Lezione da 30 minuti (invece dei normali 45)
+- Fino a 8 bambini (invece dei normali 5)
+- Attività semplificate e condensate
+- I bambini devono essere più autonomi rispetto a una lezione con genitori
 
 NOTE INTERNE — non citarle nel report, usale solo per guidare tono e contenuto:
 - Tipo di genitore: ${parentType}
@@ -1090,7 +1104,7 @@ ${isBaby ? '' : '  "oral_test": "..."'}${finaleExtra}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5',
           max_tokens: 1800,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
@@ -1454,16 +1468,6 @@ function resetForm() {
   // nessuna selezione di default per il genitore
   document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
   clearUpload();
-  // Reset documenti di riferimento
-  prevReportsData = [];
-  renderPrevReportsList();
-  document.getElementById('prev-reports-input').value = '';
-  clearCompanyReport();
-  clearTutoring();
-  // Reset special needs
-  document.querySelectorAll('input[name="sn-type"]').forEach(el => el.checked = false);
-  document.querySelectorAll('input[name="sn-status"]').forEach(el => el.checked = false);
-  document.getElementById('sn-altro').value = '';
   document.getElementById('course-info-panel').classList.remove('visible');
   document.getElementById('results-area').style.display = 'none';
   document.getElementById('debug-panel').style.display = 'none';
@@ -1472,8 +1476,1682 @@ function resetForm() {
   const sel = document.getElementById('trimestre-select');
   sel.innerHTML = '<option value="T1">Term 1</option><option value="T2">Term 2</option><option value="T3">Term 3 (finale)</option>';
   setReportType('trimestrale');
-  currentReport = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Form azzerato — pronto per un nuovo studente!', 'success');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CARTELLA STUDENTE
+// ════════════════════════════════════════════════════════════════════════════
+let _currentStudentName = null;
+let _currentStudentItems = [];
+
+function openStudentFolder(studentName) {
+  _currentStudentName = studentName;
+  const allItems = Object.values(window._historyItems || {});
+  _currentStudentItems = allItems
+    .filter(i => i.student_name.toLowerCase().trim() === studentName.toLowerCase().trim())
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  document.getElementById('student-folder-name').textContent = studentName;
+  document.getElementById('rename-area').style.display = 'none';
+  
+  const courseName = COURSE_INFO[_currentStudentItems[0]?.course]?.label || '';
+  document.getElementById('student-folder-meta').textContent = 
+    `${courseName} · ${_currentStudentItems.length} report in archivio`;
+
+  const timeline = document.getElementById('student-timeline');
+  timeline.innerHTML = _currentStudentItems.map(item => {
+    const date = new Date(item.created_at).toLocaleDateString('it-IT');
+    return `
+      <div class="timeline-item">
+        <div style="flex:1">
+          <div class="timeline-term">${item.trimestre} — Anno ${item.created_at.substring(0,4)}</div>
+          <div class="timeline-date">${date} · ${item.report_type === 'finale' ? 'Report finale' : 'Report intermedio'}</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-sm" onclick="viewItem('${item.id}')">Visualizza</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-student').classList.add('active');
+}
+
+function closeStudentModal() {
+  document.getElementById('modal-student').classList.remove('active');
+  _currentStudentName = null;
+  _currentStudentItems = [];
+}
+
+function useStudentForNewReport() {
+  if (!_currentStudentItems.length) return;
+  const latest = _currentStudentItems[_currentStudentItems.length - 1];
+  
+  // Pre-fill form
+  document.getElementById('student-name').value = latest.student_name;
+  document.getElementById('course-select').value = latest.course;
+  document.getElementById('gender-select').value = latest.gender || 'F';
+  
+  // Set parent type
+  const ptInput = document.querySelector(`input[name="parent-type"][value="${latest.parent_type}"]`);
+  if (ptInput) ptInput.checked = true;
+
+  // Trigger course change to update trimestre options
+  onCourseChange();
+
+  // Put latest report text in previous report field
+  const sections = latest.sections;
+  const prevText = Object.entries(sections)
+    .map(([k, v]) => (SECTION_LABELS[k] || k) + ':\n' + v)
+    .join('\n\n');
+
+
+
+  document.getElementById('prev-report-text').value = prevText;
+
+  closeStudentModal();
+  
+  // Switch to generate view
+  showView('generate', document.getElementById('nav-generate'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(`Form precompilato per ${latest.student_name} — aggiungi i nuovi follow-up!`, 'success');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// RINOMINA STUDENTE
+// ════════════════════════════════════════════════════════════════════════════
+function startRename() {
+  const area = document.getElementById('rename-area');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('rename-input').value = _currentStudentName;
+  document.getElementById('rename-input').focus();
+}
+
+function cancelRename() {
+  document.getElementById('rename-area').style.display = 'none';
+}
+
+async function confirmRename() {
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName || newName === _currentStudentName) { cancelRename(); return; }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
+
+  // Update all reports for this student via server
+  const ids = _currentStudentItems.map(i => i.id);
+  let errors = 0;
+
+  for (const id of ids) {
+    const res = await fetch('/api/rename-student', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: session.access_token, id, newName })
+    });
+    if (!res.ok) errors++;
+  }
+
+  if (errors > 0) {
+    showToast('Errore durante la rinomina.', 'error');
+  } else {
+    showToast(`Rinominato in "${newName}" su ${ids.length} report!`, 'success');
+    _currentStudentName = newName;
+    document.getElementById('student-folder-name').textContent = newName;
+    cancelRename();
+    await loadHistory(); // refresh
+    openStudentFolder(newName);
+  }
+}
+
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+async function exportCSV() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
+
+  const res = await fetch('/api/get-reports', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: session.access_token, filters: {} })
+  });
+  const result = await res.json();
+  const items = result.data;
+
+  if (!items || items.length === 0) {
+    showToast('Nessun report da esportare.', 'error');
+    return;
+  }
+
+  const rows = [
+    ['Data', 'Studente', 'Corso', 'Trimestre', 'Tipo', 'Motivazione e partecipazione', 'Apprendimento', 'Comportamento', 'Oral test', 'Valutazione annuale']
+  ];
+
+  items.forEach(item => {
+    const s = item.sections || {};
+    rows.push([
+      new Date(item.created_at).toLocaleDateString('it-IT'),
+      item.student_name,
+      COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course,
+      item.trimestre,
+      item.report_type === 'finale' ? 'Finale' : 'Intermedio',
+      s.motivazione_partecipazione || '',
+      s.apprendimento || '',
+      s.comportamento || '',
+      s.oral_test || '',
+      s.valutazione_annuale || ''
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"'));
+  });
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'term-reports-backup-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV esportato con successo!', 'success');
+}
+</script>
+</body>
+</html>};
+
+const NURSERY_GUIDANCE = `
+CONTESTO NURSERY/ASILO NIDO — differenze importanti rispetto alla lezione standard:
+- La lezione dura 30 minuti invece dei normali 45 minuti
+- Possono esserci fino a 8 bambini invece dei normali 5
+- I genitori NON sono presenti in classe — i bambini sono affidati al personale della struttura
+- Le attività sono semplificate e condensate rispetto alla versione standard del corso
+- Il personale dell'asilo può dare supporto durante la lezione
+- I bambini devono essere più autonomi rispetto a una lezione con i genitori presenti
+Tieni conto di questo contesto nel descrivere le dinamiche della lezione e il comportamento del bambino — l'assenza dei genitori è normale e non deve essere evidenziata come un problema.
+`;!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term Reports · Kids&Us</title>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Term Reports">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<!-- ── Supabase SDK ────────────────────────────────────────────────────────── -->
+<!-- Le variabili SUPABASE_URL e SUPABASE_ANON_KEY sono pubbliche per design:  -->
+<!-- la anon key di Supabase è pensata per stare nel frontend. La sicurezza     -->
+<!-- vera viene dalle Row Level Security policies nel database.                  -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --ink: #1A1714;
+    --warm-mid: #8B7355;
+    --accent: #D4714A;
+    --accent-light: #F0C9B8;
+    --sage: #7A9E87;
+    --sage-light: #C8DDD0;
+    --border: #E8E0D4;
+    --card: #FFFFFF;
+    --muted: #6B6158;
+    --danger: #C0392B;
+    --success: #2E7D52;
+    --warning: #C97D20;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── LOGIN ────────────────────────────────────────────────────────────────── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(212,113,74,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    border-radius: 50%;
+  }
+  #login-screen::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(122,158,135,0.12) 0%, transparent 70%);
+    bottom: -50px; left: -50px;
+    border-radius: 50%;
+  }
+  .login-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 56px 48px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+  }
+  .login-logo { font-family: 'DM Serif Display', serif; font-size: 28px; color: white; margin-bottom: 6px; }
+  .login-subtitle { color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 300; margin-bottom: 40px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .login-field { margin-bottom: 20px; }
+  .login-field label { display: block; color: rgba(255,255,255,0.55); font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .login-field input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 13px 16px; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .login-field input:focus { border-color: var(--accent); }
+  .login-field input::placeholder { color: rgba(255,255,255,0.2); }
+  .btn-login { width: 100%; background: var(--accent); color: white; border: none; border-radius: 10px; padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+  .btn-login:hover { opacity: 0.88; }
+  .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-error { color: #FF8A75; font-size: 13px; margin-top: 14px; text-align: center; display: none; }
+  .login-info { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 20px; text-align: center; line-height: 1.6; }
+
+  /* ── APP ──────────────────────────────────────────────────────────────────── */
+  #app { display: none; }
+
+  .topbar { background: var(--ink); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 58px; position: sticky; top: 0; z-index: 100; }
+  .topbar-brand { font-family: 'DM Serif Display', serif; color: white; font-size: 20px; }
+  .topbar-brand span { color: var(--accent); }
+  .topbar-nav { display: flex; gap: 4px; }
+  .nav-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.08); color: white; }
+  .nav-btn.active { color: var(--accent-light); }
+  .topbar-user { display: flex; align-items: center; gap: 10px; }
+  .user-email { color: rgba(255,255,255,0.4); font-size: 12px; }
+  .btn-logout { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+  .btn-logout:hover { background: rgba(255,255,255,0.12); color: white; }
+
+  /* ── VIEWS ────────────────────────────────────────────────────────────────── */
+  .view { display: none; padding: 40px 32px; max-width: 900px; margin: 0 auto; }
+  .view.active { display: block; }
+  .view-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--ink); margin-bottom: 6px; }
+  .view-desc { color: var(--muted); font-size: 14px; margin-bottom: 36px; font-weight: 300; }
+
+  /* ── FORM ─────────────────────────────────────────────────────────────────── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+  .field-group label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--warm-mid); }
+  .field-group input, .field-group select, .field-group textarea { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); outline: none; transition: border-color 0.2s; width: 100%; }
+  .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,113,74,0.1); }
+  .field-group textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+  .field-hint { font-size: 11px; color: var(--muted); font-weight: 300; }
+
+  .section-divider { height: 1px; background: var(--border); margin: 28px 0; position: relative; }
+  .section-divider span { position: absolute; top: 50%; left: 0; transform: translateY(-50%); background: var(--cream); padding: 0 12px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--warm-mid); }
+
+  /* ── PARENT TYPE ──────────────────────────────────────────────────────────── */
+  .parent-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .parent-type-option { position: relative; }
+  .parent-type-option input[type="radio"],
+  .parent-type-option input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .parent-type-option label { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 500; color: var(--muted); }
+  .parent-type-option input:checked + label { border-color: var(--accent); background: rgba(212,113,74,0.06); color: var(--accent); }
+  .parent-type-option label .emoji { font-size: 18px; line-height: 1; }
+
+  /* ── REPORT TYPE TOGGLE ───────────────────────────────────────────────────── */
+  .report-type-toggle { display: flex; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
+  .report-type-toggle button { flex: 1; background: transparent; border: none; padding: 9px 16px; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+  .report-type-toggle button.active { background: var(--ink); color: white; }
+
+  /* ── UPLOAD ───────────────────────────────────────────────────────────────── */
+  .upload-zone { border: 1.5px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; background: var(--card); cursor: pointer; transition: all 0.2s; position: relative; }
+  .upload-zone:hover { border-color: var(--accent); }
+  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; padding: 0; }
+  .upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .upload-text { font-size: 13px; color: var(--muted); }
+  .uploaded-file { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--sage-light); border-radius: 8px; font-size: 13px; color: var(--success); font-weight: 500; }
+
+  /* ── BUTTONS ──────────────────────────────────────────────────────────────── */
+  .btn-generate { background: var(--accent); color: white; border: none; border-radius: 12px; padding: 16px 40px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+  .btn-generate:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-save { background: var(--sage); color: white; border: none; border-radius: 10px; padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: opacity 0.2s; }
+  .btn-save:hover { opacity: 0.85; }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sm { background: transparent; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── LOADING ──────────────────────────────────────────────────────────────── */
+  .loading-bar { display: none; margin: 24px 0; padding: 20px 24px; background: var(--card); border-radius: 12px; border: 1.5px solid var(--border); }
+  .loading-bar.active { display: flex; align-items: center; gap: 16px; }
+  .spinner { width: 22px; height: 22px; border: 2.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--muted); }
+  .loading-text strong { color: var(--ink); display: block; }
+
+  /* ── RESULTS ──────────────────────────────────────────────────────────────── */
+  #results-area { display: none; margin-top: 36px; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .results-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+  .report-section-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
+  .report-section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #F5F1EB; border-bottom: 1px solid var(--border); }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--warm-mid); }
+  .btn-copy { background: transparent; border: 1.5px solid var(--border); border-radius: 7px; padding: 5px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--muted); transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .btn-copy:hover { border-color: var(--sage); color: var(--success); }
+  .btn-copy.copied { border-color: var(--sage); color: var(--success); background: var(--sage-light); }
+  .report-section-body { padding: 20px; }
+  .report-text { font-size: 14px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; }
+
+  .alert-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; }
+  .alert-banner.info { background: rgba(212,113,74,0.08); border: 1px solid rgba(212,113,74,0.2); color: var(--accent); }
+
+  /* ── HISTORY ──────────────────────────────────────────────────────────────── */
+  .history-filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .history-filters select, .history-filters input { background: var(--card); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); outline: none; }
+  .history-list { display: flex; flex-direction: column; gap: 12px; }
+  .history-item { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: border-color 0.2s; }
+  .history-item:hover { border-color: var(--warm-mid); }
+  .history-student { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .history-meta { display: flex; gap: 12px; font-size: 12px; color: var(--muted); flex-wrap: wrap; align-items: center; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+  .badge-course { background: var(--accent-light); color: var(--accent); }
+  .badge-term { background: var(--sage-light); color: var(--success); }
+  .badge-final { background: rgba(26,23,20,0.08); color: var(--ink); }
+  .history-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* ── COURSE INFO ──────────────────────────────────────────────────────────── */
+  .course-info-panel { display: none; background: rgba(212,113,74,0.05); border: 1px solid rgba(212,113,74,0.15); border-radius: 12px; padding: 16px 20px; margin-top: 12px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .course-info-panel.visible { display: block; }
+  .course-info-panel strong { color: var(--accent); }
+
+  /* ── MODAL ────────────────────────────────────────────────────────────────── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,23,20,0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: white; border-radius: 20px; width: 100%; max-width: 720px; max-height: 85vh; overflow-y: auto; padding: 36px; }
+  .modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+  .modal-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .btn-close-modal { background: var(--cream); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); flex-shrink: 0; transition: all 0.2s; }
+  .btn-close-modal:hover { background: var(--border); color: var(--ink); }
+
+  /* ── EMPTY STATE ──────────────────────────────────────────────────────────── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+  .empty-desc { font-size: 14px; font-weight: 300; }
+
+  /* ── TOAST ────────────────────────────────────────────────────────────────── */
+  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink); color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 300; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .parent-type-grid { grid-template-columns: repeat(2, 1fr); }
+    .view { padding: 24px 16px; }
+    .topbar { padding: 0 16px; }
+    .user-email { display: none; }
+  }
+
+  /* Special needs chips */
+  .sn-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 20px;
+    background: var(--cream); border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    text-transform: none; letter-spacing: 0;
+  }
+  .sn-chip:has(input:checked) { border-color: var(--sage); background: var(--sage-light); color: var(--success); }
+  .sn-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  /* Student folder modal */
+  .student-timeline { display: flex; flex-direction: column; gap: 12px; }
+  .timeline-item { 
+    background: var(--cream); border: 1.5px solid var(--border); 
+    border-radius: 12px; padding: 16px 20px; 
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .timeline-term { font-weight: 700; color: var(--ink); font-size: 14px; }
+  .timeline-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .rename-input {
+    background: var(--card); border: 1.5px solid var(--accent);
+    border-radius: 8px; padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--ink); outline: none; width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Term Reports</div>
+    <div class="login-subtitle">Kids&amp;Us · Accesso insegnanti</div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="tua@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" id="btn-login" onclick="handleLogin()">Accedi →</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-info">Accesso riservato. Per problemi contatta l'amministratore.</div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ────────────────────────────────────────────────────────────── -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">Term<span>Reports</span></div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" id="nav-generate" onclick="showView('generate', this)">✦ Genera</button>
+      <button class="nav-btn" id="nav-history" onclick="showView('history', this)">◈ Storico</button>
+    </div>
+    <div class="topbar-user">
+      <span class="user-email" id="user-email-display"></span>
+      <button class="btn-logout" onclick="handleLogout()">Esci</button>
+    </div>
+  </div>
+
+  <!-- GENERATE VIEW -->
+  <div class="view active" id="view-generate">
+    <div class="view-title">Genera Term Report</div>
+    <div class="view-desc">Inserisci i follow-up dello studente e le note integrative per generare il report personalizzato.</div>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Nome studente</label>
+        <input type="text" id="student-name" placeholder="es. Marco Rossi">
+      </div>
+      <div class="field-group">
+        <label>Corso</label>
+        <select id="course-select" onchange="onCourseChange()">
+          <option value="">— Seleziona corso —</option>
+          <option value="mousy">Mousy</option>
+          <option value="linda">Linda</option>
+          <option value="sam">Sam</option>
+          <option value="emma">Emma</option>
+          <option value="oliver">Oliver</option>
+          <option value="marcia">Marcia</option>
+          <option value="pam_paul">Pam &amp; Paul</option>
+          <option value="ben_brenda">Ben &amp; Brenda</option>
+        </select>
+        <div class="course-info-panel" id="course-info-panel"></div>
+      </div>
+      <div class="field-group">
+        <label id="trimestre-label">Trimestre</label>
+        <select id="trimestre-select">
+          <option value="T1">T1 — Primo trimestre</option>
+          <option value="T2">T2 — Secondo trimestre</option>
+          <option value="T3">T3 — Terzo trimestre</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Genere studente</label>
+        <select id="gender-select">
+          <option value="M">Maschio</option>
+          <option value="F">Femmina</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Tipo di report</label>
+        <div class="report-type-toggle">
+          <button class="active" id="btn-trimestrale" onclick="setReportType('trimestrale')">Trimestrale</button>
+          <button id="btn-finale" onclick="setReportType('finale')">Finale (con valutazione annuale)</button>
+        </div>
+      </div>
+      <div class="field-group" id="oral-test-group">
+        <label>Oral test</label>
+        <input type="text" id="oral-test" placeholder="es. Superato con ottimi risultati / Non ancora svolto">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Tipo di lezione</label>
+        <div class="report-type-toggle">
+          <button class="active" id="btn-standard-lesson" onclick="setLessonType('standard')">Standard</button>
+          <button id="btn-nursery-lesson" onclick="setLessonType('nursery')">🏫 Nursery / Asilo nido</button>
+        </div>
+        <div id="nursery-info" style="display:none; margin-top:8px; background:rgba(122,158,135,0.08); border:1px solid rgba(122,158,135,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--success); line-height:1.6;">
+          Lezione da 30 min · Fino a 8 bambini · Nessun genitore · Attività semplificate
+        </div>
+      </div>
+      <div class="field-group"></div>
+    </div>
+
+    <div class="section-divider"><span>Tipologia genitore</span></div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Come è il genitore? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
+      <div class="parent-type-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-sereno" value="sereno"><label for="pt-sereno"><span class="emoji">😊</span>Sereno</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-permaloso" value="permaloso"><label for="pt-permaloso"><span class="emoji">😤</span>Permaloso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-pignolo" value="pignolo"><label for="pt-pignolo"><span class="emoji">🔍</span>Pignolo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-ansioso" value="ansioso"><label for="pt-ansioso"><span class="emoji">😰</span>Ansioso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-entusiasta" value="entusiasta"><label for="pt-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-distaccato" value="distaccato"><label for="pt-distaccato"><span class="emoji">😶</span>Distaccato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-logorroico" value="logorroico"><label for="pt-logorroico"><span class="emoji">💬</span>Logorroico</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-collaborativo" value="collaborativo"><label for="pt-collaborativo"><span class="emoji">🤝</span>Collaborativo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-negazionista" value="negazionista"><label for="pt-negazionista"><span class="emoji">🙈</span>Negazionista</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-perfetto" value="perfetto"><label for="pt-perfetto"><span class="emoji">👑</span>Il bimbo è perfetto</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-distratto" value="distratto"><label for="pt-distratto"><span class="emoji">📱</span>Distratto</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="parent-type" id="pt-pretenzioso" value="pretenzioso"><label for="pt-pretenzioso"><span class="emoji">💸</span>Pretenzioso</label></div>
+      </div>
+      <div class="field-hint" style="margin-top:8px">Guida il tono del report — non compare mai nel testo finale.</div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Come è il bambino? <span style="font-weight:300;text-transform:none;letter-spacing:0">(selezione multipla)</span></label>
+            <div class="parent-type-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-topstudent" value="topstudent"><label for="ct-topstudent"><span class="emoji">🏆</span>Top student</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-smart" value="smart"><label for="ct-smart"><span class="emoji">🧠</span>Smart</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-entusiasta" value="entusiasta"><label for="ct-entusiasta"><span class="emoji">🌟</span>Entusiasta</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-crescita" value="crescita"><label for="ct-crescita"><span class="emoji">🦋</span>In crescita</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-affettuoso" value="affettuoso"><label for="ct-affettuoso"><span class="emoji">🥰</span>Affettuoso</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-educato" value="educato"><label for="ct-educato"><span class="emoji">😇</span>Educato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-timido" value="timido"><label for="ct-timido"><span class="emoji">🐢</span>Timido</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-vivace" value="vivace"><label for="ct-vivace"><span class="emoji">🌪️</span>Vivace</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-mammone" value="mammone"><label for="ct-mammone"><span class="emoji">👶</span>Mammone</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-stanco" value="stanco"><label for="ct-stanco"><span class="emoji">😴</span>Stanco/discontinuo</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-esibizionista" value="esibizionista"><label for="ct-esibizionista"><span class="emoji">🎪</span>Esibizionista</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-chiacchierone" value="chiacchierone"><label for="ct-chiacchierone"><span class="emoji">💬</span>Chiacchierone</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-svogliato" value="svogliato"><label for="ct-svogliato"><span class="emoji">🐌</span>Svogliato/lento</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-viziato" value="viziato"><label for="ct-viziato"><span class="emoji">😈</span>Viziato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-maleducato" value="maleducato"><label for="ct-maleducato"><span class="emoji">😠</span>Maleducato</label></div>
+        <div class="parent-type-option"><input type="checkbox" name="child-type" id="ct-permaloso" value="permaloso"><label for="ct-permaloso"><span class="emoji">😤</span>Permaloso</label></div>
+      </div>
+      <div class="field-hint"<div class="field-hint" style="margin-top:8px">Guida le descrizioni comportamentali — non compare mai nel testo finale.</div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Special needs <span style="font-weight:300;text-transform:none;letter-spacing:0">(opzionale)</span></label>
+      <div style="display:flex; flex-direction:column; gap:12px; background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Tipologia:</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="ADHD"> ADHD</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="DSA"> DSA</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="spettro_autistico"> Spettro autistico</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="ritardo_linguistico"> Ritardo linguistico</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="difficolta_relazionali"> Difficoltà relazionali</label>
+            <label class="sn-chip"><input type="checkbox" name="sn-type" value="altro_sn"> Altro:</label>
+            <input type="text" id="sn-altro" placeholder="specifica..." style="width:140px; padding:4px 10px; border-radius:20px; border:1.5px solid var(--border); font-size:12px; font-family:'DM Sans',sans-serif;">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <label style="font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0;">Situazione:</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <label class="sn-chip"><input type="radio" name="sn-status" value="diagnosticata"> ✅ Diagnosi confermata</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ipotesi"> 🔍 Mia ipotesi (non comunicata)</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="ignorata"> 🙈 Ignorata dai genitori</label>
+            <label class="sn-chip"><input type="radio" name="sn-status" value="in_valutazione"> ❓ In attesa di valutazione</label>
+          </div>
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:6px">Guida l'AI nella gestione del tono — non compare mai nel testo del report.</div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Note integrative interne</label>
+      <textarea id="extra-notes" placeholder="es. La mamma tende ad essere apprensiva, rassicurarla molto. / Il bambino ha vissuto un periodo difficile in famiglia..."></textarea>
+      <div class="field-hint">Usate dall'AI per guidare il tono e i contenuti, non compaiono nel testo del report.</div>
+    </div>
+
+    <div class="section-divider"><span>Follow-up giornalieri</span></div>
+
+    <div class="field-group" style="margin-bottom:20px">
+      <label>Follow-up lezioni</label>
+      <textarea id="followups" style="min-height:180px" placeholder="Incolla qui tutti i follow-up delle lezioni del trimestre. Es:
+12/01 - Oggi molto vivace, ha ripetuto 'red' e 'blue' spontaneamente. Ha avuto un momento difficile con la nuova storia ma si è ripreso subito.
+19/01 - Ottima lezione, ha partecipato attivamente alle canzoni e ha anticipato i comandi..."></textarea>
+    </div>
+
+    <div class="section-divider"><span>Documenti di riferimento (facoltativi)</span></div>
+
+    <!-- Report precedente singolo -->
+    <div class="field-group" style="margin-bottom:20px">
+      <label>📄 Report precedente <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF del trimestre scorso)</span></label>
+      <div class="upload-zone" onclick="document.getElementById('prev-reports-input').click()">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare il report precedente</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">PDF o TXT</div>
+      </div>
+      <input type="file" id="prev-reports-input" accept=".txt,.pdf" style="display:none" onchange="handlePrevReports(this)">
+      <div id="prev-reports-list" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;"></div>
+      <textarea id="prev-report-text" style="margin-top:10px;min-height:60px" placeholder="...oppure incolla qui il testo del report precedente"></textarea>
+    </div>
+
+    <!-- Screenshot report aziendale -->
+    <div class="field-group" style="margin-bottom:28px">
+      <label>🖼️ Screenshot report aziendale <span style="font-weight:300;text-transform:none;letter-spacing:0">(da smartreports.kidsandus.com)</span></label>
+      <div class="upload-zone" id="company-report-zone" onclick="document.getElementById('company-report-input').click()">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare lo screenshot del report aziendale</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">JPG, PNG — screenshot da smartreports.kidsandus.com</div>
+      </div>
+      <input type="file" id="company-report-input" accept="image/*" style="display:none" onchange="handleCompanyReport(this)">
+      <div class="uploaded-file" id="company-report-info" style="display:none;margin-top:10px">
+        <span>✓</span><span id="company-report-name"></span>
+        <button onclick="clearCompanyReport()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      </div>
+    </div>
+
+    <!-- Verbale colloquio -->
+    <div class="field-group" style="margin-bottom:28px">
+      <label>📋 Verbale colloquio <span style="font-weight:300;text-transform:none;letter-spacing:0">(PDF — note del tutoring con i genitori)</span></label>
+      <div class="upload-zone" onclick="document.getElementById('tutoring-input').click()">
+        <div class="upload-icon">📋</div>
+        <div class="upload-text"><strong>Clicca</strong> per caricare il verbale del colloquio</div>
+        <div class="upload-text" style="margin-top:4px;font-size:12px">PDF — aiuta a capire le preoccupazioni e gli accordi presi con i genitori</div>
+      </div>
+      <input type="file" id="tutoring-input" accept=".txt,.pdf" style="display:none" onchange="handleTutoringReport(this)">
+      <div class="uploaded-file" id="tutoring-info" style="display:none;margin-top:10px">
+        <span>✓</span><span id="tutoring-name"></span>
+        <button onclick="clearTutoring()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--success)">✕</button>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <button class="btn-generate" onclick="generateReport()" id="generate-btn">
+        <span>✦</span> Genera Report
+      </button>
+      <button onclick="resetForm()" style="background:transparent; border:1.5px solid var(--border); border-radius:12px; padding:15px 24px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; color:var(--muted); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        ↺ Nuovo studente
+      </button>
+    </div>
+
+    <div class="loading-bar" id="loading-bar">
+      <div class="spinner"></div>
+      <div class="loading-text">
+        <strong id="loading-msg">Elaborazione in corso...</strong>
+        <span>L'AI sta analizzando i follow-up e personalizzando il report</span>
+      </div>
+    </div>
+
+    <!-- DEBUG PANEL -->
+    <div id="debug-panel" style="display:none; margin-top:16px; background:#1A1714; border-radius:12px; overflow:hidden;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:#2a2420;">
+        <span style="color:#8B7355; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">⚙ Log di sistema</span>
+        <button onclick="document.getElementById('debug-panel').style.display='none'" style="background:none; border:none; color:#6B6158; cursor:pointer; font-size:16px;">✕</button>
+      </div>
+      <div id="debug-list" style="padding:12px 16px; max-height:200px; overflow-y:auto; color:#aaa;"></div>
+    </div>
+
+    <div id="results-area">
+      <div class="results-header">
+        <div class="results-title">📋 Report generato</div>
+        <button class="btn-save" id="btn-save" onclick="saveToSupabase()">
+          <span>◈</span> Salva nello storico
+        </button>
+      </div>
+      <div id="alert-container"></div>
+      <div id="sections-container"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div class="view" id="view-history">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px;">
+      <div class="view-title">Storico Report</div>
+      <button class="btn-save" onclick="exportCSV()" style="margin-top:8px; background:var(--warm-mid);">
+        <span>↓</span> Esporta CSV
+      </button>
+    </div>
+    <div class="view-desc">Tutti i tuoi report salvati, con accesso rapido ad ogni sezione.</div>
+
+    <div class="history-filters">
+      <select id="filter-course" onchange="loadHistory()">
+        <option value="">Tutti i corsi</option>
+        <option value="mousy">Mousy</option>
+        <option value="linda">Linda</option>
+        <option value="sam">Sam</option>
+        <option value="emma">Emma</option>
+        <option value="oliver">Oliver</option>
+        <option value="marcia">Marcia</option>
+        <option value="pam_paul">Pam &amp; Paul</option>
+        <option value="ben_brenda">Ben &amp; Brenda</option>
+      </select>
+      <select id="filter-term" onchange="loadHistory()">
+        <option value="">Tutti i trimestri</option>
+        <option value="T1">T1</option>
+        <option value="T2">T2</option>
+        <option value="T3">T3</option>
+      </select>
+      <input type="text" id="filter-name" placeholder="🔍 Cerca per nome..." oninput="loadHistory()">
+    </div>
+
+    <div id="history-loading" style="display:none;text-align:center;padding:40px;color:var(--muted)">
+      <div class="spinner" style="margin:0 auto 12px"></div>Caricamento...
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+
+<!-- MODAL: visualizza report storico -->
+<div class="modal-overlay" id="modal-view" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-student-name"></div>
+        <div class="modal-subtitle" id="modal-meta"></div>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-sections-container"></div>
+  </div>
+</div>
+
+<!-- MODAL: cartella studente -->
+<div class="modal-overlay" id="modal-student" onclick="closeStudentModal()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:800px">
+    <div class="modal-header">
+      <div style="flex:1">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="modal-title" id="student-folder-name"></div>
+          <button onclick="startRename()" style="background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:4px 12px; font-size:12px; cursor:pointer; color:var(--muted); font-family:'DM Sans',sans-serif;">✏️ Rinomina</button>
+        </div>
+        <div id="rename-area" style="display:none; margin-top:10px; display:none;">
+          <input type="text" class="rename-input" id="rename-input" placeholder="Nuovo nome...">
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button onclick="confirmRename()" class="btn-save" style="padding:8px 16px; font-size:13px;">✓ Salva</button>
+            <button onclick="cancelRename()" class="btn-sm" style="padding:8px 16px;">Annulla</button>
+          </div>
+        </div>
+        <div class="modal-subtitle" id="student-folder-meta"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-start;">
+        <button onclick="useStudentForNewReport()" class="btn-generate" style="padding:10px 18px; font-size:13px; border-radius:10px;">
+          <span>✦</span> Nuovo report
+        </button>
+        <button class="btn-close-modal" onclick="closeStudentModal()">✕</button>
+      </div>
+    </div>
+    <div class="student-timeline" id="student-timeline"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// CONFIGURAZIONE SUPABASE
+// Sostituisci questi due valori con quelli del tuo progetto Supabase.
+// Puoi trovarli su: Supabase Dashboard → Project Settings → API
+// La anon key è progettata per stare nel frontend: la sicurezza viene
+// dalle Row Level Security policies che creeremo nel database.
+// ════════════════════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://pluyvqfaezeuwwsyiohc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsdXl2cWZhZXpldXd3c3lpb2hjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTk1MzIsImV4cCI6MjA4OTQ5NTUzMn0.MHVFS3fCezTKnGhNJuxTsXDPRB0Hp_NueIUkMTXlyac';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── Heartbeat: mantiene attivo il server Render ogni 10 minuti ───────────────
+setInterval(() => {
+  fetch('/api/ping').catch(() => {});
+}, 10 * 60 * 1000);
+
+// ════════════════════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════════════════════
+let currentUser = null;
+
+// Controlla sessione esistente all'avvio
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) onLogin(session.user);
+})();
+
+// Ascolta cambiamenti di sessione (logout da un'altra scheda, scadenza token, ecc.)
+sb.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    onLogin(session.user);
+  } else {
+    onLogout();
+  }
+});
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('btn-login');
+  const errEl = document.getElementById('login-error');
+
+  if (!email || !pass) { showLoginError('Inserisci email e password.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Accesso in corso...';
+  errEl.style.display = 'none';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  btn.disabled = false;
+  btn.textContent = 'Accedi →';
+
+  if (error) showLoginError(error.message === 'Invalid login credentials'
+    ? 'Email o password non corretti.'
+    : error.message);
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function onLogin(user) {
+  currentUser = user;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('user-email-display').textContent = user.email;
+}
+
+function onLogout() {
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+}
+
+// Enter su password
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// NAVIGAZIONE
+// ════════════════════════════════════════════════════════════════════════════
+function showView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'history') loadHistory();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DATI CORSI
+// ════════════════════════════════════════════════════════════════════════════
+const COURSE_INFO = {
+  mousy:     { label: 'Mousy — Babies (0–2 anni)',        desc: 'Familiarizzazione con i suoni dell\'inglese. Prime istruzioni semplici nel contesto delle attività. I genitori partecipano alla lezione. Focus su: canzoni, routine, parti del corpo, colori, animali. Obiettivo: iniziare a dire qualche parola (Hello, Bye-bye, Please, Thank you).' },
+  linda:     { label: 'Linda — Toddlers (1,5–3 anni)',    desc: 'Inizia a mettere insieme 2–3 parole. Espressioni quotidiane: saluti, presentazioni, ringraziamenti. Vocabolario: corpo, azioni, colori, dimensioni (big/small). I genitori sono presenti. Il bambino inizia a riprodurre strutture brevi.' },
+  sam:       { label: 'Sam — Kids (2,5–4 anni)',          desc: 'Comprensione globale delle storie. Saluti e presentazione (nome, età), stati d\'animo (happy/sad/angry). Descrizione oggetti (colore, dimensione). Struttura "Can I have... please?". Vocabolario: routine, azioni, animali, alimenti.' },
+  emma:      { label: 'Emma — Kids (3–5 anni)',           desc: 'Comunicazione con strutture brevi: "It\'s rainy", "Emma can eat in the kitchen". Comprensione delle storie. Presentazione completa (nome, età, stato d\'animo). Preferenze: "I like strawberries". Lavoro con personaggio Emma.' },
+  oliver:    { label: 'Oliver — Kids (4–6 anni)',         desc: 'Produzione di frasi più articolate. Strutture per chiedere e rispondere. Comprensione estesa. Vocabolario più ricco. Lavoro autonomo sul Workbook. Maggiore produzione orale spontanea.' },
+  marcia:    { label: 'Marcia — Junior (5–7 anni)',       desc: 'Strutture comunicative più complesse. Avvio alla lettura e scrittura. Autonomia nelle attività. Comprensione di istruzioni elaborate. Maggiore produzione orale e utilizzo del Workbook in modo indipendente.' },
+  pam_paul:  { label: 'Pam & Paul — Junior (6–8 anni)',  desc: 'Corso avanzato. Lettura, scrittura, grammatica di base. Conversazione strutturata. Utilizzo autonomo del Workbook. Vocabolario tematico più ricco.' },
+  ben_brenda:{ label: 'Ben & Brenda — Pre-teens (8–11 anni)', desc: 'Livello intermedio. Abilità integrate: lettura, scrittura, ascolto, produzione orale. Grammatica, vocabolario tematico, comprensione testi. Maggiore autonomia e consapevolezza della lingua.' }
+};
+
+const SECTION_LABELS = {
+  motivazione_partecipazione: 'Motivazione e partecipazione',
+  apprendimento:               'Apprendimento',
+  comportamento:               'Comportamento',
+  oral_test:                   'Commento oral test',
+  valutazione_annuale:         'Valutazione generale anno scolastico'
+};
+
+const BABIES_COURSES = ['mousy', 'linda'];
+
+function onCourseChange() {
+  const course   = document.getElementById('course-select').value;
+  const panel    = document.getElementById('course-info-panel');
+  const selTrim  = document.getElementById('trimestre-select');
+  const labelTrim = document.getElementById('trimestre-label');
+
+  // Hide oral test for babies
+  const oralGroup = document.getElementById('oral-test-group');
+  if (oralGroup) {
+    oralGroup.style.display = (course === 'mousy' || course === 'linda') ? 'none' : 'flex';
+  }
+
+  // Update course info panel
+  if (course && COURSE_INFO[course]) {
+    panel.innerHTML = `<strong>${COURSE_INFO[course].label}</strong><br>${COURSE_INFO[course].desc}`;
+    panel.classList.add('visible');
+  } else {
+    panel.classList.remove('visible');
+  }
+
+  // Update trimestre options based on course type
+  if (course && BABIES_COURSES.includes(course)) {
+    labelTrim.textContent = 'Semester';
+    selTrim.innerHTML = `
+      <option value="S1">Semester 1</option>
+      <option value="S2">Semester 2 (finale)</option>`;
+    // Auto-set report type based on semester
+    selTrim.onchange = () => updateReportTypeFromTerm();
+    updateReportTypeFromTerm();
+  } else {
+    labelTrim.textContent = 'Term';
+    selTrim.innerHTML = `
+      <option value="T1">Term 1</option>
+      <option value="T2">Term 2</option>
+      <option value="T3">Term 3 (finale)</option>`;
+    selTrim.onchange = () => updateReportTypeFromTerm();
+    updateReportTypeFromTerm();
+  }
+}
+
+function updateReportTypeFromTerm() {
+  const course  = document.getElementById('course-select').value;
+  const trimVal = document.getElementById('trimestre-select').value;
+  const isBaby  = BABIES_COURSES.includes(course);
+  const isFinal = isBaby ? trimVal === 'S2' : trimVal === 'T3';
+  if (isFinal) {
+    setReportType('finale');
+  } else {
+    setReportType('trimestrale');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TIPO REPORT
+// ════════════════════════════════════════════════════════════════════════════
+let reportType = 'trimestrale';
+let lessonType = 'standard';
+
+function setReportType(type) {
+  reportType = type;
+  document.getElementById('btn-trimestrale').classList.toggle('active', type === 'trimestrale');
+  document.getElementById('btn-finale').classList.toggle('active', type === 'finale');
+}
+
+function setLessonType(type) {
+  lessonType = type;
+  document.getElementById('btn-standard-lesson').classList.toggle('active', type === 'standard');
+  document.getElementById('btn-nursery-lesson').classList.toggle('active', type === 'nursery');
+  document.getElementById('nursery-info').style.display = type === 'nursery' ? 'block' : 'none';
+  // Se nursery, imposta automaticamente scuola esterna come contesto
+  if (type === 'nursery') {
+    document.getElementById('contesto-select').value = 'scuola_esterna';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// UPLOAD FILES
+// ════════════════════════════════════════════════════════════════════════════
+let prevReportsData = []; // [{name, text}, ...]
+let companyReportBase64 = null;
+let companyReportMime = null;
+
+// ── Report precedenti multipli ───────────────────────────────────────────────
+function handlePrevReports(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      prevReportsData.push({ name: file.name, text: e.target.result });
+      renderPrevReportsList();
+    };
+    reader.readAsText(file);
+  });
+  input.value = '';
+}
+
+function renderPrevReportsList() {
+  const list = document.getElementById('prev-reports-list');
+  list.innerHTML = prevReportsData.map((r, i) => `
+    <div class="uploaded-file">
+      <span>✓</span><span style="flex:1">${escHtml(r.name)}</span>
+      <button onclick="removePrevReport(${i})" style="background:none;border:none;cursor:pointer;color:var(--success);font-size:16px;">✕</button>
+    </div>`).join('');
+}
+
+function removePrevReport(idx) {
+  prevReportsData.splice(idx, 1);
+  renderPrevReportsList();
+}
+
+// ── Screenshot report aziendale ──────────────────────────────────────────────
+function handleCompanyReport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    companyReportBase64 = dataUrl.split(',')[1];
+    companyReportMime = file.type;
+    document.getElementById('company-report-name').textContent = file.name;
+    document.getElementById('company-report-info').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCompanyReport() {
+  companyReportBase64 = null;
+  companyReportMime = null;
+  document.getElementById('company-report-info').style.display = 'none';
+  document.getElementById('company-report-input').value = '';
+}
+
+// ── Verbale colloquio ────────────────────────────────────────────────────────
+let tutoringText = '';
+
+function handleTutoringReport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    tutoringText = e.target.result;
+    document.getElementById('tutoring-name').textContent = file.name;
+    document.getElementById('tutoring-info').style.display = 'flex';
+  };
+  reader.readAsText(file);
+}
+
+function clearTutoring() {
+  tutoringText = '';
+  document.getElementById('tutoring-info').style.display = 'none';
+  document.getElementById('tutoring-input').value = '';
+}
+
+// Legacy - kept for compatibility
+function clearUpload() {
+  prevReportsData = [];
+  renderPrevReportsList();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// GENERA REPORT
+// ════════════════════════════════════════════════════════════════════════════
+let currentReport = null;
+let reportSaved = false;
+
+const LOADING_MESSAGES = [
+  'Analisi dei follow-up in corso...',
+  'Personalizzazione del tono sul tipo di genitore...',
+  'Stesura delle sezioni del report...',
+  'Revisione della qualità linguistica italiana...'
+];
+
+const PARENT_GUIDANCE = {
+  sereno:        'Genitore equilibrato che ascolta con fiducia e serenità. Recepisce le informazioni senza ansie né pretese. Tono professionale e diretto, bilancia aspetti positivi e aree di miglioramento naturalmente.',
+  permaloso:     'Tono molto diplomatico. Qualsiasi aspetto critico va inquadrato come opportunità di crescita, mai come problema. Sottolinea abbondantemente i progressi. Evita qualsiasi formulazione che possa sembrare una critica.',
+  pignolo:       'Tono preciso, dettagliato e professionale. Il genitore vuole informazioni concrete e specifiche. Usa esempi precisi. Spiega le strategie didattiche adottate. Sii puntuale e metodico.',
+  ansioso:       'Tono molto rassicurante. Ogni possibile preoccupazione va subito bilanciata da una rassicurazione. Sottolinea che tutto è sotto controllo e che le strategie sono già in atto.',
+  entusiasta:    'Tono caldo ed energico. Il genitore è motivato, puoi essere diretto anche sulle sfide, sapendo che le accoglierà positivamente.',
+  distaccato:    'Tono formale e molto professionale. Fatti concreti, progressi misurabili, strategie chiare. Meno calore, più sostanza e precisione.',
+  logorroico:    'Il genitore vuole molti dettagli e tende a fare molte domande. Fornisci informazioni concrete e specifiche, anticipa le possibili domande, spiega bene le strategie adottate.',
+  collaborativo: 'Genitore che lavora attivamente con la scuola e recepisce bene i consigli. Puoi essere diretto e propositivo, suggerendo attività da fare a casa e strategie condivise.',
+  negazionista:  'Il genitore tende a non vedere le difficoltà del figlio. Usa esempi concreti e osservazioni fattuali. Incornicia tutto in modo positivo ma sii preciso e specifico per far passare il messaggio.',
+  perfetto:      'Il genitore non accetta critiche sul figlio e lo considera sempre perfetto. Ogni osservazione deve essere formulata in modo estremamente positivo. Mai usare parole come difficoltà, problema, migliorare.',
+  distratto:     'Il genitore è difficile da coinvolgere. Usa un linguaggio semplice e diretto, messaggi chiari e concreti. Evita tecnicismi.',
+  pretenzioso:   'Il genitore si sente in diritto di pretendere molto in virtù del costo del corso — recuperi non dovuti, attenzioni extra, giustificazioni su ogni scelta didattica. Descrive il percorso del figlio come un servizio acquistato piuttosto che un percorso educativo.'
+};
+
+const CHILD_GUIDANCE = {
+  topstudent:    'Eccellente sotto ogni aspetto: apprende rapidamente, si comporta in modo esemplare, rispetta le regole, è autonomo, gestisce i materiali con cura. Il bambino ideale sotto tutti i punti di vista.',
+  smart:         'Coglie rapidamente gli stimoli, assimila con facilità e risponde prontamente alle proposte didattiche. IMPORTANTE: NON usare mai le parole intelligente o intelligenza — usa espressioni come coglie rapidamente, assimila con facilità, risponde prontamente. Riguarda SOLO le capacità di apprendimento, non il comportamento. Non fare confronti col gruppo. Non confondere con Top student.',
+  entusiasta:    'Il bambino/a è sempre molto motivato e partecipa con energia e entusiasmo. Valorizza questa caratteristica positiva nel report.',
+  crescita:      "Il bambino/a ha fatto un percorso significativo nel corso del periodo. Sottolinea l'evoluzione e i cambiamenti positivi osservati rispetto all'inizio.",
+  affettuoso:    "Il bambino/a è molto affettuoso e cerca spesso il contatto con l'insegnante. Valorizza questa caratteristica come segno di fiducia e benessere in classe.",
+  educato:       'Il bambino/a è rispettoso, segue le regole del gruppo e ha un comportamento esemplare. Valorizza queste qualità come base solida per un apprendimento sereno.',
+  timido:        'Il bambino/a è riservato e ha bisogno di tempo per sentirsi a proprio agio. Descrivi i suoi progressi con delicatezza, valorizzando ogni piccolo passo verso la partecipazione.',
+  vivace:        'Il bambino/a è molto energico e vivace, a volte difficile da gestire. Descrivi la sua energia in modo positivo, sottolineando come viene canalizzata nelle attività.',
+  mammone:       "Il bambino/a fatica a separarsi dal genitore, ha bisogno di rassicurazioni continue e stenta a vivere la lezione in autonomia. Descrivi il percorso di distacco come un processo naturale, valorizzando ogni piccolo passo verso l'indipendenza.",
+  stanco:        'Il bambino/a ha un rendimento variabile, spesso influenzato dalla stanchezza o da fattori esterni. Descrivi le sue potenzialità nei momenti di maggiore presenza.',
+  esibizionista: "Il bambino/a cerca continuamente l'attenzione del gruppo, si mette in mostra e tende a fare il protagonista anche quando non è il momento. Descrivi diplomaticamente la necessità di canalizzare questa energia in modo più costruttivo.",
+  chiacchierone: 'Il bambino/a parla moltissimo, spesso fuori turno o fuori contesto, disturbando il ritmo della lezione. Descrivi diplomaticamente la necessità di imparare ad ascoltare e rispettare i tempi del gruppo.',
+  svogliato:     'Il bambino/a mostra scarsa motivazione e, nonostante la ripetizione costante dei contenuti, fatica ad interiorizzarli. Descrivi diplomaticamente la necessità di maggiore stimolo, senza mai usare termini negativi. Valorizza i rari momenti di partecipazione.',
+  viziato:       'Il bambino/a è abituato a ottenere sempre quello che vuole e può essere impaziente o frustrabile. Descrivi le strategie di gestione diplomaticamente, senza mai usare la parola viziato. Valorizza i momenti in cui ha rispettato le regole.',
+  maleducato:    'Il bambino/a presenta comportamenti irrispettosi. Descrivi le strategie adottate con tatto, inquadrando i comportamenti problematici come aree di crescita. Non usare mai termini come maleducato o irrispettoso.',
+  permaloso:     'Il bambino/a si offende facilmente e reagisce in modo sproporzionato a osservazioni neutre, tendendo a chiudersi o a rifiutare la partecipazione. Descrivi con delicatezza estrema, evitando qualsiasi osservazione che possa essere percepita come critica.'
+};
+
+function debugLog(msg, type = 'info') {
+  const panel = document.getElementById('debug-panel');
+  const list  = document.getElementById('debug-list');
+  if (!panel || !list) return;
+  panel.style.display = 'block';
+  const time = new Date().toLocaleTimeString('it-IT');
+  const colors = { info: '#aaa', ok: '#7A9E87', error: '#e07060', warn: '#C97D20' };
+  const el = document.createElement('div');
+  el.style.cssText = `font-size:12px; padding:3px 0; border-bottom:1px solid #2a2420; color:${colors[type]||colors.info}; font-family:monospace; word-break:break-all;`;
+  el.textContent = '[' + time + '] ' + msg;
+  list.appendChild(el);
+  list.scrollTop = list.scrollHeight;
+}
+
+async function generateReport() {
+  // Reset debug panel
+  const debugList = document.getElementById('debug-list');
+  if (debugList) debugList.innerHTML = '';
+
+  const studentName = document.getElementById('student-name').value.trim();
+  const course      = document.getElementById('course-select').value;
+  const trimestre   = document.getElementById('trimestre-select').value;
+  const isBaby      = (course === 'mousy' || course === 'linda');
+  const gender      = document.getElementById('gender-select').value;
+  const oralTest    = document.getElementById('oral-test').value.trim();
+  const followups   = document.getElementById('followups').value.trim();
+  const extraNotes  = document.getElementById('extra-notes').value.trim();
+  const parentTypes = Array.from(document.querySelectorAll('input[name="parent-type"]:checked')).map(el => el.value);
+  const parentType  = parentTypes.length > 0 ? parentTypes.join(', ') : 'sereno';
+  const childTypes  = Array.from(document.querySelectorAll('input[name="child-type"]:checked')).map(el => el.value);
+  const isNursery   = lessonType === 'nursery';
+  const snTypes     = Array.from(document.querySelectorAll('input[name="sn-type"]:checked')).map(el => el.value);
+  const snAltro     = document.getElementById('sn-altro').value.trim();
+  const snStatus    = document.querySelector('input[name="sn-status"]:checked')?.value || '';
+  const snStatusMap = {
+    diagnosticata:   'Diagnosi confermata — i genitori sono consapevoli e collaborano',
+    ipotesi:         "Ipotesi dell'insegnante non ancora comunicata ai genitori — gestisci con estrema delicatezza, senza mai suggerire diagnosi nel testo",
+    ignorata:        'I genitori sono stati informati ma minimizzano o ignorano — usa un tono fermo ma diplomatico, con osservazioni fattuali concrete',
+    in_valutazione:  'Segnalato e in attesa di valutazione specialistica — tono di supporto e collaborazione'
+  };
+  const hasSN = snTypes.length > 0 || snAltro;
+  const prevReportText = document.getElementById('prev-report-text').value.trim();
+  const allPrevReports = [...prevReportsData.map(r => r.text), prevReportText].filter(Boolean);
+
+  debugLog('Bottone premuto — controllo campi...', 'info');
   reportSaved = false;
+
+  if (!studentName || !course || !followups) {
+    const missing = [];
+    if (!studentName) missing.push('nome studente');
+    if (!course) missing.push('corso');
+    if (!followups) missing.push('follow-up');
+    debugLog('Campi mancanti: ' + missing.join(', '), 'error');
+    showToast('Compila: ' + missing.join(', '), 'error');
+    return;
+  }
+
+  debugLog('Studente: ' + studentName + ' | Corso: ' + course + ' | ' + trimestre, 'info');
+
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+  document.getElementById('loading-bar').classList.add('active');
+  document.getElementById('results-area').style.display = 'none';
+
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    document.getElementById('loading-msg').textContent = LOADING_MESSAGES[msgIdx % LOADING_MESSAGES.length];
+    msgIdx++;
+  }, 2800);
+
+  try {
+    const courseInfo = COURSE_INFO[course];
+    const finaleExtra = reportType === 'finale'
+      ? ',\n  "valutazione_annuale": "testo valutazione generale anno con consigli estate..."'
+      : '';
+
+    const systemPrompt = `Sei un'esperta insegnante di inglese di Kids&Us con anni di esperienza nella redazione di term report per bambini.
+Scrivi SEMPRE in italiano perfetto e naturale, come farebbe una madrelingua italiana colta.
+EVITA traduzioni letterali dall'inglese e frasi innaturali.
+Usa un registro professionale ma accessibile ai genitori.
+Il report è scritto in terza persona (es. "Aurora partecipa attivamente...") oppure con "noi" scolastico.
+NON usare la prima persona singolare dell'insegnante.
+NON menzionare mai il tipo di genitore, le note interne o le istruzioni nel testo del report.
+Ogni sezione: 3-5 righe fluide, personalizzate e specifiche per questo studente.
+${isBaby ? 'IMPORTANTE: NON includere la sezione oral_test nel JSON — non è prevista per questo corso.' : ''}
+Rispondi SOLO con JSON valido, senza testo prima o dopo, senza markdown.`;
+
+    const userPrompt = `Genera un term report Kids&Us per il seguente studente.
+
+DATI STUDENTE:
+- Nome: ${studentName}
+- Corso: ${courseInfo.label}
+- Trimestre: ${trimestre}
+- Genere: ${gender === 'M' ? 'Maschio' : 'Femmina'}
+- Anno scolastico: 2024/2025
+
+OBIETTIVI DEL CORSO:
+${courseInfo.desc}
+
+PROGRESSIONE CORSI Kids&Us (usa questi nomi esatti se menzioni il corso successivo):
+Mousy → Linda → Sam → Emma → Oliver → Marcia → Pam & Paul → Ben & Brenda
+Il corso successivo a ${courseInfo.label.split('—')[0].trim()} è: ${{mousy:'Linda', linda:'Sam', sam:'Emma', emma:'Oliver', oliver:'Marcia', marcia:'Pam & Paul', pam_paul:'Ben & Brenda', ben_brenda:'un percorso più avanzato'}[course] || 'il corso successivo'}.
+Non inventare mai nomi di corsi diversi da quelli elencati sopra.
+
+FOLLOW-UP LEZIONI:
+${followups}
+
+${(course !== 'mousy' && course !== 'linda') ? 'ORAL TEST: ' + (oralTest || 'Non specificato') : '(Oral test non previsto per questo corso)'}
+${isNursery ? \`
+CONTESTO NURSERY/ASILO NIDO:
+- Lezione da 30 minuti (invece dei normali 45)
+- Fino a 8 bambini (invece dei normali 5)
+- Nessun genitore presente — bambini affidati al personale della struttura
+- Attività semplificate e condensate
+- I bambini devono essere più autonomi rispetto a una lezione con genitori
+Adatta il report a questo contesto: non fare riferimento ai genitori durante la lezione, menziona eventualmente il personale della struttura se rilevante.\` : ''}
+
+NOTE INTERNE — non citarle nel report, usale solo per guidare tono e contenuto:
+- Tipo di genitore: ${parentType}
+  Istruzioni per ogni caratteristica:
+  ${parentTypes.map(pt => '  • ' + pt + ': ' + (PARENT_GUIDANCE[pt] || '')).join('\n')}
+  Se ci sono più caratteristiche, bilancia le indicazioni in modo coerente.
+${childTypes.length > 0 ? '- Personalità bambino/a: ' + childTypes.join(', ') + '\n  ' + childTypes.map(ct => '  • ' + ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n') : ''}
+${hasSN ? '- AREA DI ATTENZIONE (non citare mai nel testo, usa solo per modulare il tono):\n  Tipologia: ' + [...snTypes, snAltro].filter(Boolean).join(', ') + '\n  Situazione: ' + (snStatusMap[snStatus] || snStatus) + '\n  Adatta il linguaggio con professionalità e delicatezza. Non fare mai riferimento a diagnosi o difficoltà specifiche nel testo del report.' : ''}
+  \${childTypes.map(ct => '  • ' + ct + ': ' + (CHILD_GUIDANCE[ct] || '')).join('\n')}\` : ''}
+- Note aggiuntive: ${extraNotes || 'Nessuna'}
+${reportType === 'finale' ? `
+ISTRUZIONI SPECIALI PER REPORT FINALE:
+- Usa il PASSATO PROSSIMO per descrivere progressi (es. "ha dimostrato", "ha partecipato", "ha raggiunto").
+- Usa il presente solo per caratteristiche stabili della personalità.
+- Usa il futuro per i consigli estivi.
+- EVITA il presente per i progressi (NON "continua a migliorare" MA "ha migliorato").
+- Tono da documento conclusivo di fine anno, non da aggiornamento intermedio.` : ''}
+${allPrevReports.length > 0 ? 'REPORT PRECEDENTE — mantieni continuita ed evidenzia progressi o cambiamenti:\n' + allPrevReports[0].substring(0, 2000) : ''}
+${tutoringText ? 'VERBALE COLLOQUIO CON I GENITORI — non citare mai nel report che esiste un verbale, usalo solo per modulare tono e contenuti:\n' + tutoringText.substring(0, 1500) : ''}
+
+Genera il report con queste sezioni (testo fluido in italiano, NO bullet points):
+
+{
+  "motivazione_partecipazione": "...",
+  "apprendimento": "...",
+  "comportamento": "...",
+${isBaby ? '' : '  "oral_test": "..."'}${finaleExtra}
+}`;
+
+    debugLog('Invio richiesta a /api/generate...', 'info');
+
+    let response;
+    try {
+      response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1800,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+    } catch (fetchErr) {
+      debugLog('Errore di rete: ' + fetchErr.message, 'error');
+      throw new Error('Server non raggiungibile: ' + fetchErr.message);
+    }
+
+    debugLog('Risposta ricevuta — HTTP status: ' + response.status, response.ok ? 'ok' : 'error');
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      debugLog('Risposta non JSON — status: ' + response.status, 'error');
+      throw new Error('Risposta non valida dal server (HTTP ' + response.status + ')');
+    }
+
+    if (!response.ok) {
+      const errMsg = data?.error?.message || JSON.stringify(data).substring(0, 200);
+      debugLog('Errore API Anthropic: ' + errMsg, 'error');
+      throw new Error(errMsg);
+    }
+
+    debugLog('Risposta API ok — estrazione contenuto...', 'ok');
+
+    const rawText = data.content?.find(b => b.type === 'text')?.text || '';
+    if (!rawText) {
+      debugLog('Nessun testo nella risposta. Struttura: ' + JSON.stringify(data).substring(0, 300), 'error');
+      throw new Error('Risposta vuota dall\'AI');
+    }
+
+    debugLog('Testo ricevuto (' + rawText.length + ' caratteri) — parsing JSON...', 'info');
+
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      debugLog('JSON non trovato. Inizio testo: ' + rawText.substring(0, 300), 'error');
+      throw new Error('Formato risposta non valido');
+    }
+
+    const sections = JSON.parse(jsonMatch[0]);
+    debugLog('Successo! Sezioni generate: ' + Object.keys(sections).join(', '), 'ok');
+
+    currentReport = {
+      student_name: studentName,
+      course,
+      trimestre,
+      gender,
+      parent_type: parentType,
+      child_type: childTypes.join(', '),
+      special_needs: hasSN ? [...snTypes, snAltro].filter(Boolean).join(', ') + (snStatus ? ' (' + snStatus + ')' : '') : '',
+      oral_test: oralTest,
+      report_type: reportType,
+      sections,
+      created_at: new Date().toISOString()
+    };
+
+    renderResults(sections);
+
+  } catch (err) {
+    debugLog('ERRORE: ' + err.message, 'error');
+    showToast('Errore: ' + err.message, 'error');
+    console.error(err);
+  } finally {
+    clearInterval(msgInterval);
+    btn.disabled = false;
+    document.getElementById('loading-bar').classList.remove('active');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// RENDER RISULTATI
+// ════════════════════════════════════════════════════════════════════════════
+function renderResults(sections) {
+  document.getElementById('alert-container').innerHTML = `
+    <div class="alert-banner info">
+      <span>✦</span>
+      <span>Report generato. Puoi <strong>modificare</strong> il testo direttamente prima di salvare. Poi clicca <strong>Copia</strong> per incollare sulla piattaforma Kids&Us.</span>
+    </div>`;
+
+  const container = document.getElementById('sections-container');
+  container.innerHTML = '';
+
+  for (const [key, text] of Object.entries(sections)) {
+    const label = SECTION_LABELS[key] || key;
+    const card = document.createElement('div');
+    card.className = 'report-section-card';
+    card.innerHTML = `
+      <div class="report-section-header">
+        <span class="section-label">${label}</span>
+        <button class="btn-copy" onclick="copyText(this, document.getElementById('rt-${key}').innerText)">
+          <span>⎘</span> Copia
+        </button>
+      </div>
+      <div class="report-section-body">
+        <div class="report-text" id="rt-${key}" contenteditable="true" 
+          style="outline:none; border-radius:8px; transition: background 0.2s;"
+          onfocus="this.style.background='#FFFBF5'; this.style.boxShadow='inset 0 0 0 2px var(--accent)'"
+          onblur="this.style.background=''; this.style.boxShadow=''; updateCurrentReport('${key}', this.innerText)"
+        >${escHtml(text)}</div>
+      </div>`;
+    container.appendChild(card);
+  }
+
+  document.getElementById('results-area').style.display = 'block';
+  document.getElementById('results-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateCurrentReport(key, newText) {
+  if (currentReport && currentReport.sections) {
+    currentReport.sections[key] = newText.trim();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SALVA SU SUPABASE
+// ════════════════════════════════════════════════════════════════════════════
+async function saveToSupabase() {
+  if (!currentReport) return;
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '<span>◌</span> Salvataggio...';
+
+  debugLog('Tentativo salvataggio via server...', 'info');
+
+  const { data: { session } } = await sb.auth.getSession();
+  debugLog('Sessione: ' + (session ? session.user.email : 'NESSUNA'), session ? 'ok' : 'error');
+
+  if (!session) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>◈</span> Salva nello storico';
+    showToast('Sessione scaduta — effettua di nuovo il login.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/save-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: session.access_token,
+        report: {
+          student_name: currentReport.student_name,
+          course: currentReport.course,
+          trimestre: currentReport.trimestre,
+          gender: currentReport.gender,
+          parent_type: currentReport.parent_type,
+          oral_test: currentReport.oral_test,
+          report_type: currentReport.report_type,
+          sections: currentReport.sections
+        }
+      })
+    });
+
+    const result = await res.json();
+    btn.disabled = false;
+
+    if (!res.ok || result.error) {
+      debugLog('Errore server: ' + (result.error || res.status), 'error');
+      btn.innerHTML = '<span>◈</span> Salva nello storico';
+      showToast('Errore: ' + (result.error || 'Riprova'), 'error');
+    } else {
+      debugLog('Salvato con successo!', 'ok');
+    reportSaved = true;
+      btn.innerHTML = '<span>✓</span> Salvato!';
+      btn.style.background = 'var(--success)';
+      showToast('Report salvato nello storico!', 'success');
+      setTimeout(() => {
+        btn.innerHTML = '<span>◈</span> Salva nello storico';
+        btn.style.background = 'var(--sage)';
+      }, 3000);
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>◈</span> Salva nello storico';
+    debugLog('Errore di rete: ' + err.message, 'error');
+    showToast('Errore di rete: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// STORICO DA SUPABASE
+// ════════════════════════════════════════════════════════════════════════════
+async function loadHistory() {
+  const loadingEl = document.getElementById('history-loading');
+  const listEl    = document.getElementById('history-list');
+  loadingEl.style.display = 'block';
+  listEl.innerHTML = '';
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { loadingEl.style.display = 'none'; return; }
+
+  const filterCourse = document.getElementById('filter-course').value;
+  const filterTerm   = document.getElementById('filter-term').value;
+  const filterName   = document.getElementById('filter-name').value.trim();
+
+  try {
+    const res = await fetch('/api/get-reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: session.access_token,
+        filters: { course: filterCourse, trimestre: filterTerm, name: filterName }
+      })
+    });
+    const result = await res.json();
+    loadingEl.style.display = 'none';
+    const items = result.data;
+    const error = result.error;
+
+  if (error) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Errore nel caricamento</div><div class="empty-desc">${error}</div></div>`;
+    return;
+  }
+
+  if (!items || items.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">◈</div>
+        <div class="empty-title">Nessun report salvato</div>
+        <div class="empty-desc">Genera un report e salvalo per trovarlo qui.</div>
+      </div>`;
+    return;
+  }
+
+  // Store items in global map for safe access
+  window._historyItems = {};
+  items.forEach(item => { window._historyItems[item.id] = item; });
+
+  // Group by student name for folder view
+  const studentGroups = {};
+  items.forEach(item => {
+    const key = item.student_name.toLowerCase().trim();
+    if (!studentGroups[key]) studentGroups[key] = [];
+    studentGroups[key].push(item);
+  });
+
+  listEl.innerHTML = items.map(item => {
+    const date = new Date(item.created_at).toLocaleDateString('it-IT');
+    const courseName = COURSE_INFO[item.course]?.label.split('—')[0].trim() || item.course;
+    const studentKey = item.student_name.toLowerCase().trim();
+    const reportCount = studentGroups[studentKey].length;
+    return `
+      <div class="history-item">
+        <div style="flex:1">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="history-student" style="cursor:pointer; text-decoration:underline; text-decoration-color:var(--border);" 
+              onclick="openStudentFolder('${escHtml(item.student_name)}')">${escHtml(item.student_name)}</div>
+            ${reportCount > 1 ? `<span style="background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px;">${reportCount} report</span>` : ''}
+          </div>
+          <div class="history-meta">
+            <span class="badge badge-course">${courseName}</span>
+            <span class="badge badge-term">${item.trimestre}</span>
+            ${item.report_type === 'finale' ? '<span class="badge badge-final">Report finale</span>' : ''}
+            <span>📅 ${date}</span>
+          </div>
+        </div>
+        <div class="history-actions">
+          <button class="btn-sm" onclick="viewItem('${item.id}')">Visualizza</button>
+          <button class="btn-sm danger" onclick="deleteItem('${item.id}')">Elimina</button>
+        </div>
+      </div>`;
+  }).join('');
+  } catch(err) {
+    loadingEl.style.display = 'none';
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Errore</div><div class="empty-desc">' + err.message + '</div></div>';
+  }
+}
+
+function viewItem(itemId) {
+  const item = (window._historyItems || {})[itemId];
+  if (!item) { showToast('Report non trovato.', 'error'); return; }
+  const date = new Date(item.created_at).toLocaleDateString('it-IT');
+  const courseName = COURSE_INFO[item.course]?.label || item.course;
+
+  document.getElementById('modal-student-name').textContent = item.student_name;
+  document.getElementById('modal-meta').textContent = `${courseName} · ${item.trimestre} · ${date}`;
+
+  const container = document.getElementById('modal-sections-container');
+  container.innerHTML = '';
+
+  for (const [key, text] of Object.entries(item.sections)) {
+    const label = SECTION_LABELS[key] || key;
+    const div = document.createElement('div');
+    div.className = 'report-section-card';
+    div.style.marginBottom = '14px';
+    const safeText = text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    div.innerHTML = `
+      <div class="report-section-header">
+        <span class="section-label">${label}</span>
+        <button class="btn-copy" onclick="copyText(this, \`${safeText}\`)">
+          <span>⎘</span> Copia
+        </button>
+      </div>
+      <div class="report-section-body">
+        <div class="report-text">${escHtml(text)}</div>
+      </div>`;
+    container.appendChild(div);
+  }
+
+  document.getElementById('modal-view').classList.add('active');
+}
+
+async function deleteItem(id) {
+  if (!confirm('Eliminare questo report dallo storico?')) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showToast('Sessione scaduta.', 'error'); return; }
+
+  const res = await fetch('/api/delete-report', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: session.access_token, id })
+  });
+  const result = await res.json();
+  if (!res.ok || result.error) { showToast('Errore: ' + (result.error || 'Riprova'), 'error'); return; }
+  showToast('Report eliminato.', 'success');
+  loadHistory();
+}
+
+function closeModal() {
+  document.getElementById('modal-view').classList.remove('active');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════════════════════
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> Copiato!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+  });
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function resetForm() {
+  // Se c'è un report generato e non salvato, chiedi conferma
+  if (document.getElementById('results-area').style.display !== 'none' && currentReport && !reportSaved) {
+    const studentName = currentReport.student_name || 'questo studente';
+    if (!confirm('Hai generato un report per ' + studentName + ' ma non lo hai ancora salvato nello storico.\n\nVuoi continuare senza salvare?')) {
+      return;
+    }
+  }
+
+  document.getElementById('student-name').value = '';
+  document.getElementById('course-select').value = '';
+  document.getElementById('oral-test').value = '';
+  document.getElementById('followups').value = '';
+  document.getElementById('extra-notes').value = '';
+  document.getElementById('prev-report-text').value = '';
+  document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
+  // nessuna selezione di default per il genitore
+  document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
+  clearUpload();
+  document.getElementById('course-info-panel').classList.remove('visible');
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('debug-panel').style.display = 'none';
+  document.getElementById('debug-list').innerHTML = '';
+  // Reset trimestre to default
+  const sel = document.getElementById('trimestre-select');
+  sel.innerHTML = '<option value="T1">Term 1</option><option value="T2">Term 2</option><option value="T3">Term 3 (finale)</option>';
+  setReportType('trimestrale');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   showToast('Form azzerato — pronto per un nuovo studente!', 'success');
 }
