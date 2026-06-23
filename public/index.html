@@ -693,6 +693,7 @@ function onLogin(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-email-display').textContent = user.email;
+  setTimeout(() => clearAllFormFields(), 100);
 }
 
 function onLogout() {
@@ -1449,6 +1450,22 @@ function escHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function clearAllFormFields() {
+  document.querySelectorAll('input[name="sn-status"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="sn-type"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="parent-type"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[name="child-type"]').forEach(el => el.checked = false);
+  const snAltro = document.getElementById('sn-altro');
+  if (snAltro) snAltro.value = '';
+  const prevText = document.getElementById('prev-report-text');
+  if (prevText) prevText.value = '';
+  prevReportsData = [];
+  renderPrevReportsList();
+  clearCompanyReport();
+  clearTutoring();
+  setLessonType('standard');
 }
 
 function resetForm() {
